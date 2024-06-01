@@ -20,7 +20,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "fmt": "prettier --write '**/*.{ts,json,css,scss,md}'",
-    "zip": "npm run build && node src/zip.js",
+    "zip": "npm run build && node zip.js",
     "party:dev": "partykit dev"
   },
   "dependencies": {

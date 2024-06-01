@@ -2,7 +2,6 @@ import { defineManifest } from '@crxjs/vite-plugin'
 //@ts-ignore
 import packageData from '../package.json'
 
-//@ts-ignore
 const isDev = process.env.NODE_ENV == 'development'
 
 export default defineManifest({
@@ -20,15 +19,15 @@ export default defineManifest({
     default_popup: 'templates/popup.html',
     default_icon: 'img/logo-48.png',
   },
-  options_page: 'options.html',
+  options_page: 'templates/options.html',
   background: {
-    service_worker: 'src/background/index.ts',
+    service_worker: 'src/core/background/index.ts',
     type: 'module',
   },
   content_scripts: [
     {
       matches: ['http://*/*', 'https://*/*'],
-      js: ['src/contentScript/index.ts'],
+      js: ['src/core/contentScript/index.ts'],
     },
   ],
   side_panel: {
