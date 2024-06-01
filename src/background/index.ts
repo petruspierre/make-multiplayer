@@ -1,7 +1,5 @@
-console.log('background is running')
+import { socket } from "../socket/client"
 
 chrome.runtime.onMessage.addListener((request) => {
-  if (request.type === 'COUNT') {
-    console.log('background has received a message from popup, and count is ', request?.count)
-  }
+  socket.send('hello from background')
 })
