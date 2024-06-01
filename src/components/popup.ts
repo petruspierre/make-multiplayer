@@ -1,7 +1,7 @@
 import { html, css, LitElement, PropertyValues } from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 
-@customElement('popup-root')
+@customElement('mmp-popup')
 export class Popup extends LitElement {
   @state() count = 0
 
@@ -94,9 +94,3 @@ export class Popup extends LitElement {
 }
 
 export default Popup
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'popup-root': Popup
-  }
-}

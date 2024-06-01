@@ -26,7 +26,7 @@ export default defineManifest({
   },
   content_scripts: [
     {
-      matches: ['http://*/*', 'https://*/*'],
+      matches: ['https://*/*', 'https://www.nytimes.com/games/wordle/*'],
       js: ['src/core/contentScript/index.ts'],
     },
   ],
