@@ -3,16 +3,15 @@ import { defineConfig } from 'vite'
 import { crx } from '@crxjs/vite-plugin'
 import manifest from './src/manifest'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   build: {
     emptyOutDir: true,
     outDir: 'build',
     rollupOptions: {
       input: {
-        options: path.resolve('options.html'),
-        popup: path.resolve('popup.html'),
-        sidepanel: path.resolve('sidepanel.html'),
+        options: path.resolve('templates', 'options.html'),
+        popup: path.resolve('templates', 'popup.html'),
+        sidepanel: path.resolve('templates', 'sidepanel.html'),
       },
       output: {
         chunkFileNames: 'assets/chunk-[hash].js',
