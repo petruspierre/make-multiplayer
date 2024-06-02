@@ -1,8 +1,12 @@
 import { css, html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
-@customElement('mmp-overlay')
-export class Overlay extends LitElement {
+@customElement('mmp-letrinha-overlay')
+export class LetrinhaOverlay extends LitElement {
+  connectedCallback(): void {
+    super.connectedCallback();
+  }
+
   render() {
     return html`
       <div class="container">
