@@ -1,18 +1,24 @@
+import { socket } from "@/socket/client";
 import { css, html, LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 
 @customElement('mmp-letrinha-overlay')
 export class LetrinhaOverlay extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
+    socket.send('game:letrinha:overlay:connected')
   }
 
   render() {
     return html`
       <div class="container">
         <div class="content">
-          <span>Multiplayer:</span>
-          <span>Enabled</span>
+          <div>
+            <span>Multiplayer:</span>
+            <span>Enabled</span>
+          </div>
+          <p>0 players connected</p>
+          <p>Attempts remaining: 7</p>
         </div>
       </div>
     `

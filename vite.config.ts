@@ -1,6 +1,8 @@
 import * as path from 'path'
 import { defineConfig } from 'vite'
 import { crx } from '@crxjs/vite-plugin'
+import tsconfigPaths from 'vite-tsconfig-paths'
+
 import manifest from './src/manifest'
 
 export default defineConfig({
@@ -18,5 +20,5 @@ export default defineConfig({
       },
     },
   },
-  plugins: [crx({ manifest })],
+  plugins: [tsconfigPaths(), crx({ manifest })],
 })

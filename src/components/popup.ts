@@ -1,34 +1,39 @@
+import { generateShortId } from '@/utils/generate-short-id'
 import { html, css, LitElement, PropertyValues } from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 
 @customElement('mmp-popup')
 export class Popup extends LitElement {
-  @state() count = 0
-
-  private link = 'https://github.com/guocaoyi/create-chrome-ext'
-
   constructor() {
     super()
-    chrome.storage.sync.get(['count'], (result) => {
-      this.count = result.count || 0
-    })
   }
 
-  minus = () => this.count > 0 && this.count--
+  // protected updated(changedProperties: PropertyValues) {
+  //   if (changedProperties.has('count')) {
+  //     chrome.storage.sync.set({ count: changedProperties.get('count') })
+  //     chrome.runtime.sendMessage({ type: 'COUNT', count: this.count })
+  //   }
+  // }
 
-  add = () => (this.count += 1)
+  private createNewRoom = async () => {
+    const id = generateShortId()
+    console.log(`Creating new room ${id}`)
+    await fetch(`http://localhost:1999/party/make-multiplayer-party`, {
+      method: "POST",
+      body: JSON.stringify({ id }),
+    });
+  }
 
-  protected updated(changedProperties: PropertyValues) {
-    if (changedProperties.has('count')) {
-      chrome.storage.sync.set({ count: changedProperties.get('count') })
-      chrome.runtime.sendMessage({ type: 'COUNT', count: this.count })
-    }
+  private joinRoom = () => {
+    console.log('Joining room')
   }
 
   render() {
     return html`
       <main>
-        <button>Create room</button>
+        <button 
+          @click=${this.createNewRoom}
+        >Create room</button>
 
         <input type="text" placeholder="Room code">
         <button>Join room</button>
