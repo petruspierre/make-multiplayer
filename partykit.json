@@ -2,5 +2,8 @@
   "$schema": "https://www.partykit.io/schema.json",
   "name": "make-multiplayer-party",
   "main": "party/server.ts",
+  "parties": {
+    "session": "party/session.ts"
+  },
   "compatibilityDate": "2024-06-01"
 }

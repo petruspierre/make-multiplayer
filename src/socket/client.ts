@@ -1,6 +1,7 @@
 import PartySocket from "partysocket";
 
-export const socket = new PartySocket({
+export const getSocketForSession = (room: string) => new PartySocket({
   host: 'localhost:1999',
-  room: 'make-multiplayer'
+  party: 'session',
+  room
 })

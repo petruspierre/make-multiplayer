@@ -1,3 +1,4 @@
+import { getSocketForSession } from "@/socket/client";
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {classMap} from 'lit/directives/class-map.js';
@@ -15,7 +16,7 @@ export class Overlay extends LitElement {
   status: OverlayStatus = OverlayStatus.CONNECTING
 
   @state()
-  private room: string = ''
+  private session: string = ''
 
   @state()
   private socket: PartySocket | null = null
@@ -24,20 +25,17 @@ export class Overlay extends LitElement {
     super.connectedCallback();
   }
 
-  private createNewRoom = async () => {
+  private createNewSession = async () => {
     try {
       const response = await fetch(`http://localhost:1999/party/make-multiplayer-party`, {
         method: "POST",
       });
 
       if (response.ok) {
-        const { id } = await response.json();
-        this.room = id
+        const { code } = await response.json();
+        this.session = code
 
-        this.socket = new PartySocket({
-          host: 'localhost:1999',
-          room: id,
-        })
+        this.socket = getSocketForSession(code)
 
         this.socket.onmessage = (message) => {
           console.log('Message received:', message)
@@ -48,12 +46,9 @@ export class Overlay extends LitElement {
     }
   }
 
-  private joinRoom = async () => {
+  private joinSession = async () => {
     try {
-      this.socket = new PartySocket({
-        host: 'localhost:1999',
-        room: 'ABC123',
-      })
+      this.socket = getSocketForSession('ABC123')
     } catch {
       this.status = OverlayStatus.ERROR
     }
@@ -70,17 +65,17 @@ export class Overlay extends LitElement {
             'error': this.status === 'error'
           })}></div>
 
-          ${this.room
+          ${this.session
             ? html`
               <p>
-                Room: ${this.room}
+                Session: ${this.session}
               </p>
           ` :
             this.status === OverlayStatus.CONNECTED
             ? html`
               <div class="connected-container">
-                <button @click=${this.joinRoom}>JOIN</button>
-                <button @click=${this.createNewRoom}>CREATE</button>
+                <button @click=${this.joinSession}>JOIN</button>
+                <button @click=${this.createNewSession}>CREATE</button>
               </div>
             `: html`
               <p>

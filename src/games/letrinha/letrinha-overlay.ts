@@ -1,4 +1,3 @@
-import { socket } from "@/socket/client";
 import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
 
@@ -6,7 +5,6 @@ import { customElement, state } from "lit/decorators.js";
 export class LetrinhaOverlay extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
-    socket.send('game:letrinha:overlay:connected')
   }
 
   render() {

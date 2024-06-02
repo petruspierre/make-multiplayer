@@ -1,25 +1,36 @@
 import type * as Party from 'partykit/server'
-import { json, notFound, ok } from './utils/response'
-import { generateShortId } from './utils/generate-short-id'
+import { error, json, notFound, ok } from './utils/response'
+import { Session } from './utils/messages'
+import { generateShortId } from './utils/generate-short-id' 
 
-const partyName = 'make-multiplayer-party'
+export default class MakeMultiplayerMainServer implements Party.Server {
+  private sessions: Session[] = []
 
-export type Player = {
-  connectionId: string
-  name: string
-}
-
-export default class MakeMultiplayerServer implements Party.Server {
-  players: Player[] = []
-
-  constructor(readonly room: Party.Room) { }
+  constructor(readonly room: Party.Room) {
+    this.sessions = []
+  }
 
   async onRequest(req: Party.Request) {
     if (req.method === 'POST') {
-      // const id = generateShortId();
-      const id = 'ABC123'
+      let sessionExists = true
+      let code = ''
+      let tries = 0
+      while (sessionExists) {
+        if (tries > 10) break
 
-      return json({ id })
+        code = generateShortId();
+        sessionExists = this.sessions.some(room => room.code === code)
+        if (!sessionExists) {
+          this.sessions.push({ code })
+        }
+        tries++
+      }
+
+      if (!code) {
+        return error('Failed to generate session code')
+      }
+
+      return json({ code: 'ABC123' })
     }
 
     if (req.method === 'GET') {
@@ -32,17 +43,6 @@ export default class MakeMultiplayerServer implements Party.Server {
 
     return notFound()
   }
-
-  async onConnect(connection: Party.Connection, ctx: Party.ConnectionContext) {
-    console.log(`
-    Connected:
-      id: ${connection.id}
-      room: ${this.room.id}
-      url: ${new URL(ctx.request.url).pathname}
-    `);
-
-    this.room.broadcast('player connected', [connection.id])
-  }
 }
 
-MakeMultiplayerServer satisfies Party.Worker
+MakeMultiplayerMainServer satisfies Party.Worker
