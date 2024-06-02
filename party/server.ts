@@ -1,16 +1,32 @@
 import type * as Party from 'partykit/server'
-import { Message } from './utils/message'
-import { notFound, ok } from './utils/response'
+import { json, notFound, ok } from './utils/response'
+import { generateShortId } from './utils/generate-short-id'
 
 const partyName = 'make-multiplayer-party'
 
+export type Player = {
+  connectionId: string
+  name: string
+}
+
 export default class MakeMultiplayerServer implements Party.Server {
+  players: Player[] = []
+
   constructor(readonly room: Party.Room) { }
 
   async onRequest(req: Party.Request) {
     if (req.method === 'POST') {
-      const payload = await req.json<{ id: string }>()
-      console.log('Creating new room:', payload.id)
+      // const id = generateShortId();
+      const id = 'ABC123'
+
+      return json({ id })
+    }
+
+    if (req.method === 'GET') {
+      return json({ message: 'Hello from party server!' })
+    }
+
+    if (req.method === 'OPTIONS') {
       return ok()
     }
 
@@ -18,6 +34,15 @@ export default class MakeMultiplayerServer implements Party.Server {
   }
 
   async onConnect(connection: Party.Connection, ctx: Party.ConnectionContext) {
-    console.log('Connected to server:', connection.id)
+    console.log(`
+    Connected:
+      id: ${connection.id}
+      room: ${this.room.id}
+      url: ${new URL(ctx.request.url).pathname}
+    `);
+
+    this.room.broadcast('player connected', [connection.id])
   }
 }
+
+MakeMultiplayerServer satisfies Party.Worker
