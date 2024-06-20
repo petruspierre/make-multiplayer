@@ -3,6 +3,7 @@ import { Overlay } from "@/components/overlay";
 import Popup from "@/components/popup";
 import { Sidepanel } from "@/components/side-panel";
 import { LetrinhaOverlay } from "@/games/letrinha/letrinha-overlay";
+import { SessionProvider } from "@/socket/session-context";
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -11,5 +12,6 @@ declare global {
     'mmp-side-panel': Sidepanel;
     'mmp-popup': Popup;
     'mmp-options': Options;
+    'mmp-session-provider': SessionProvider;
   }
 }

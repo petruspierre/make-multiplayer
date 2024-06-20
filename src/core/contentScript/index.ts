@@ -1,7 +1,8 @@
-import '../../components/overlay'
 import { Overlay, OverlayStatus } from '../../components/overlay';
+import { updateStatus } from '../chromeMessages';
+
+import '../../components/overlay'
 import '../../games/letrinha/letrinha-overlay'
-import { ChromeMessage, chromeMessages, updateStatus } from '../chromeMessages';
 
 type Precondition = {
   query: string;
@@ -37,9 +38,6 @@ const supportedGames: GameIntegration[] = [
     timeout: 1000
   }
 ]
-
-// Setup preconditions
-// Share health status with the background script
 
 console.log('Running make multiplayer script')
 
@@ -91,8 +89,8 @@ function insertOverlay() {
         overlayRoot.status = OverlayStatus.CONNECTED
         if (overlayElement) {
           // Insert game overlay to root overlay
-          // const gameOverlay = document.createElement(overlayElement)
-          // document.querySelector(root)?.appendChild(gameOverlay)
+          const gameOverlay = document.createElement(overlayElement)
+          overlayRoot.appendChild(gameOverlay)
         }
 
         return

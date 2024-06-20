@@ -6,10 +6,6 @@ export type ChromeMessage = {
 }
 
 export const chromeMessages = {
-  STATUS_CONNECTED: 'chrome:status:connected',
-  STATUS_CONNECTING: 'chrome:status:connecting',
-  STATUS_DISCONNECTED: 'chrome:status:disconnected',
-  STATUS_ERROR: 'chrome:status:error',
   STATUS_CHANGE: 'chrome:status:change',
 }
 

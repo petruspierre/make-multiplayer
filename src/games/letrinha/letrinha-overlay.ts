@@ -1,5 +1,5 @@
 import { css, html, LitElement } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement } from "lit/decorators.js";
 
 @customElement('mmp-letrinha-overlay')
 export class LetrinhaOverlay extends LitElement {
@@ -11,11 +11,6 @@ export class LetrinhaOverlay extends LitElement {
     return html`
       <div class="container">
         <div class="content">
-          <div>
-            <span>Multiplayer:</span>
-            <span>Enabled</span>
-          </div>
-          <p>0 players connected</p>
           <p>Attempts remaining: 7</p>
         </div>
       </div>
