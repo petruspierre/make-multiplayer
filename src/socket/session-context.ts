@@ -9,7 +9,7 @@ import { produce } from "immer";
 export const sessionContext = createContext<SessionState>(Symbol.for("game-context"))
 
 export enum SessionStatus {
-  CONNECTING = 'connecting',
+  NOT_CONNECTED = 'not_connected',
   CONNECTED = 'connected',
   ERROR = 'error'
 }
@@ -36,7 +36,7 @@ export class SessionProvider extends LitElement {
     this.state = {
       code: null,
       socket: null,
-      status: SessionStatus.CONNECTING,
+      status: SessionStatus.NOT_CONNECTED,
       addListener: this.addListener.bind(this)
     }
     
@@ -73,7 +73,7 @@ export class SessionProvider extends LitElement {
       if (response.ok) {
         const { code } = await response.json();
 
-        const socket = getSocketForSession(code)
+        const socket = await this.connectToSession(code)
 
         this.state = produce(this.state, draft => {
           draft.code = code
@@ -92,20 +92,28 @@ export class SessionProvider extends LitElement {
     if(!code) return
 
     try {
-      const socket = getSocketForSession(code)
+      const socket = await this.connectToSession(code)
 
-      this.state = {
-        ...this.state,
-        code,
-        socket,
-        status: SessionStatus.CONNECTED
-      }
+      this.state = produce(this.state, draft => {
+        draft.code = code
+        draft.socket = socket
+        draft.status = SessionStatus.CONNECTED
+      })
     } catch {
-      this.state = {
-        ...this.state,
-        status: SessionStatus.ERROR
-      }
+      this.state = produce(this.state, draft => {
+        draft.status = SessionStatus.ERROR
+      })
     }
+  }
+
+  private connectToSession = async (code: string) => {
+    const socket = getSocketForSession(code)
+
+    socket.onmessage = (event) => {
+      console.log('Message from server ', event.data)
+    }
+
+    return socket
   }
 
   render() {
