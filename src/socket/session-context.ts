@@ -24,9 +24,10 @@ export enum SessionStatus {
 export type SessionState = {
   code: string | null
   socket: PartySocket | null
-  status: SessionStatus,
+  status: SessionStatus
   players: Player[]
   self?: Player
+  leaveSession: () => void
 }
 
 @customElement('mmp-session-provider')
@@ -42,7 +43,8 @@ export class SessionProvider extends LitElement {
       code: null,
       socket: null,
       status: SessionStatus.NOT_CONNECTED,
-      players: []
+      players: [],
+      leaveSession: this.leaveSession.bind(this)
     }
     
     chrome.runtime.onMessage.addListener((message: ChromeMessage, _, sendResponse) => {
@@ -132,6 +134,17 @@ export class SessionProvider extends LitElement {
     }
 
     return socket
+  }
+
+  leaveSession = () => {
+    this.state.socket?.close()
+    this.state = produce(this.state, draft => {
+      draft.code = null
+      draft.socket = null
+      draft.status = SessionStatus.NOT_CONNECTED
+      draft.players = []
+      draft.leaveSession = this.leaveSession.bind(this)
+    })
   }
 
   render() {

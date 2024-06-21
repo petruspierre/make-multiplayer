@@ -33,6 +33,10 @@ export class Overlay extends LitElement {
       if (this.sessionState.status === SessionStatus.CONNECTED) {
         this.status = OverlayStatus.NOT_STARTED
       }
+
+      if (this.sessionState.status === SessionStatus.ERROR || this.sessionState.status === SessionStatus.NOT_CONNECTED) {
+        this.status = OverlayStatus.NOT_CONNECTED
+      }
     }
   }
 
@@ -63,7 +67,7 @@ export class Overlay extends LitElement {
         <span>${this.players.length} conectados.</span>
 
         <div class="actions">
-          <button>Sair da sessão</button>
+          <button @click=${() => this.sessionState.leaveSession()}>Sair da sessão</button>
 
           ${this.isHost ? html`
             <button ?disabled=${this.players.length < 2}>Iniciar sessão</button>
