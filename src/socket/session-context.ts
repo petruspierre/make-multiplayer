@@ -26,11 +26,6 @@ export class SessionProvider extends LitElement {
   @property({ type: Object })
   public state!: SessionState
 
-  protected updated(_changedProperties: PropertyValues): void {
-		super.updated(_changedProperties);
-		console.log('SessionProvider updated', _changedProperties, this.state);
-	}
-
   connectedCallback(): void {
     super.connectedCallback()
 

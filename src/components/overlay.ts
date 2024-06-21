@@ -28,9 +28,8 @@ export class Overlay extends LitElement {
   protected updated(_changedProperties: PropertyValues): void {
     super.updated(_changedProperties);
 
-    console.log('Overlay updated', _changedProperties)
-
     if (_changedProperties.has('sessionState')) {
+      console.log('Session status updated to ', this.sessionState.status)
       if (this.sessionState.status === SessionStatus.CONNECTED) {
         this.status = OverlayStatus.NOT_STARTED
       }
@@ -38,10 +37,16 @@ export class Overlay extends LitElement {
   }
 
   render() {
+    if (this.status === OverlayStatus.NOT_CONNECTED) {
+      return html``
+    }
+
     return html`
       <div class="background">
         <div class="content">
-          <div>${this.sessionState.status}</div>
+          ${this.status === OverlayStatus.NOT_STARTED ? html`
+            <h2>Waiting for more players</h2>
+          ` : ''}
         </div>
       </div>
     `
