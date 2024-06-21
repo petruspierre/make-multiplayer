@@ -28,6 +28,7 @@ export default defineManifest({
     {
       matches: ['https://letrinha.petrus.dev.br/game', 'https://www.nytimes.com/games/wordle/*'],
       js: ['src/core/contentScript/index.ts'],
+      run_at: 'document_start'
     },
   ],
   side_panel: {

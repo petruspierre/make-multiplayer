@@ -1,7 +1,8 @@
-import { Overlay, OverlayStatus } from '../../components/overlay';
-import { updateStatus } from '../chromeMessages';
+import { Overlay } from '../../components/overlay';
+import { SessionProvider } from '../../socket/session-context';
 
 import '../../components/overlay'
+import '../../socket/session-context'
 import '../../games/letrinha/letrinha-overlay'
 
 type Precondition = {
@@ -43,7 +44,8 @@ console.log('Running make multiplayer script')
 
 const currentUrl = window.location.href
 const game = supportedGames.find(game => currentUrl.includes(game.url))
-let overlayRoot: Overlay;
+let rootOverlay: Overlay;
+let sessionProvider: SessionProvider;
 
 function insertOverlay() {
   if (game) {
@@ -52,15 +54,14 @@ function insertOverlay() {
     console.log(`Game detected: ${name}`)
     console.log(`Start checking ${preconditions.length} preconditions...`)
 
-    overlayRoot = document.createElement('mmp-overlay')
     const rootElement = document.querySelector(root)
-  
-    rootElement?.appendChild(overlayRoot)
+    sessionProvider = document.createElement('mmp-session-provider');
+    rootElement?.appendChild(sessionProvider)
+
+    rootOverlay = document.createElement('mmp-overlay')
+    sessionProvider.shadowRoot!.appendChild(rootOverlay)
 
     console.log('Root overlay element inserted')
-
-    chrome.runtime.sendMessage(updateStatus(OverlayStatus.CONNECTING))
-    overlayRoot.status = OverlayStatus.CONNECTING
 
     let time = 0;
     let conditionsMet = new Map<string, boolean>()
@@ -85,13 +86,11 @@ function insertOverlay() {
         clearInterval(checkPreconditions)
 
         console.log('All conditions met. Inserting game overlay...')
-        chrome.runtime.sendMessage(updateStatus(OverlayStatus.CONNECTED))
-        overlayRoot.status = OverlayStatus.CONNECTED
-        if (overlayElement) {
-          // Insert game overlay to root overlay
-          const gameOverlay = document.createElement(overlayElement)
-          overlayRoot.appendChild(gameOverlay)
-        }
+        // if (overlayElement) {
+        //   // Insert game overlay to root overlay
+        //   const gameOverlay = document.createElement(overlayElement)
+        //   rootOverlay.appendChild(gameOverlay)
+        // }
 
         return
       }
@@ -100,18 +99,5 @@ function insertOverlay() {
     }, 100)
   }  
 }
-
-// chrome.runtime.onMessage.addListener((message: ChromeMessage) => {
-//   const { type, payload } = message
-//   console.log('Received message', message)
-
-//   switch (type) {
-//     case chromeMessages.STATUS_CHANGE:
-//       if (overlayRoot) {
-//         overlayRoot.status = payload.status
-//       }
-//       break
-//   }
-// })
 
 insertOverlay()

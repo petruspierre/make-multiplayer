@@ -1,98 +1,100 @@
-import { getSocketForSession } from '@/socket/client'
-import { html, css, LitElement, PropertyValues } from 'lit'
-import { customElement, property, state } from 'lit/decorators.js'
-import PartySocket from 'partysocket'
-
-export enum OverlayStatus {
-  CONNECTING = 'connecting',
-  CONNECTED = 'connected',
-  ERROR = 'error'
-}
+import { chromeMessages } from '@/core/chromeMessages'
+import { html, css, LitElement } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 
 @customElement('mmp-popup')
 export class Popup extends LitElement {
-  @property()
-  status: OverlayStatus = OverlayStatus.CONNECTING
+  @state()
+  private sessionCode: string = ''
 
   @state()
-  private session: string = ''
+  private loading: boolean = false
 
-  @state()
-  private socket: PartySocket | null = null
-  // protected updated(changedProperties: PropertyValues) {
-  //   if (changedProperties.has('count')) {
-  //     chrome.storage.sync.set({ count: changedProperties.get('count') })
-  //     chrome.runtime.sendMessage({ type: 'COUNT', count: this.count })
-  //   }
-  // }
+  private pingInterval: NodeJS.Timeout | null = null
 
-  @state()
-  private counter: number = 0
+  connectedCallback() {
+    super.connectedCallback();
+
+    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+      this.pingSessionState(tab.id!)
+
+      this.pingInterval = setInterval(this.pingSessionState.bind(this), 1000, tab.id!)
+    });
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval)
+    }
+  }
+
+  pingSessionState = (tabId: number) => {
+    chrome.tabs.sendMessage(tabId, {
+      type: chromeMessages.FETCH_SESSION,
+    }, (data: string) => {
+      this.sessionCode = data
+      this.loading = false
+    })
+  }
 
   render() {
     return html`
       <main>
         Make Multiplayer
 
-        <div>
-          <button @click=${this.joinSession}>JOIN</button>
-          <button @click=${this.createNewSession}>CREATE</button>
-        </div>
+        ${this.loading ? html`<div>Loading...</div>` : ''}
 
-        <div>
-          <span>Session: ${this.session}</span>
-          <span>Status: ${this.status}</span>
-        </div>
-
-        <div>
-          <span>Counter: ${this.counter}</span>
-          <button @click=${() => this.counter++}>Increment</button>
-        </div>
+        ${this.sessionCode ? html`
+          <div>
+            <span>Session: ${this.sessionCode}</span>
+          </div>
+        ` : html`
+          <div>
+            <button @click=${this.joinSession} ?disabled=${this.loading}>JOIN</button>
+            <button @click=${this.createNewSession} ?disabled=${this.loading}>CREATE</button>
+          </div>
+        `}
       </main>
     `
   }
 
   private createNewSession = async () => {
+    this.loading = true
+
     try {
-      const response = await fetch(`http://localhost:1999/party/make-multiplayer-party`, {
-        method: "POST",
-      });
-
-      if (response.ok) {
-        const { code } = await response.json();
-        this.session = code
-
-        this.socket = getSocketForSession(code)
-
-        this.socket.onmessage = (message) => {
-          console.log('Message received:', message)
-        }
-
-        chrome.runtime.sendMessage({ type: 'SESSION', session: code })
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab) {
+        this.loading = false
+        return
       }
-    } catch {
-      this.status = OverlayStatus.ERROR
+
+      chrome.tabs.sendMessage(tab.id!, {
+        type: chromeMessages.CREATE_SESSION,
+      })
+    } catch(err) {
+      this.loading = false
     }
   }
 
   private joinSession = async () => {
+    this.loading = true
+
     try {
-      this.socket = getSocketForSession('ABC123')
-
-      this.session = 'ABC123'
-
-      this.socket.onmessage = (message) => {
-        console.log('Message received:', message)
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab) {
+        this.loading = false
+        return
       }
-    } catch {
-      this.status = OverlayStatus.ERROR
+
+      chrome.tabs.sendMessage(tab.id!, {
+        type: chromeMessages.JOIN_SESSION,
+      })
+    } catch(err) {
+      this.loading = false
     }
   }
-
-  // private openOptions = () => {
-  //   chrome.runtime.openOptionsPage();
-  // }
-
 
   static styles = css`
     @media (prefers-color-scheme: light) {
