@@ -8,6 +8,9 @@ export class Popup extends LitElement {
   private sessionCode: string = ''
 
   @state()
+  private sessionInput: string = ''
+
+  @state()
   private loading: boolean = false
 
   private pingInterval: NodeJS.Timeout | null = null
@@ -44,7 +47,7 @@ export class Popup extends LitElement {
       <main>
         Make Multiplayer
 
-        ${this.loading ? html`<div>Loading...</div>` : ''}
+        ${this.loading ? html`<p>Loading...</p>` : ''}
 
         ${this.sessionCode ? html`
           <div>
@@ -52,7 +55,15 @@ export class Popup extends LitElement {
           </div>
         ` : html`
           <div>
-            <button @click=${this.joinSession} ?disabled=${this.loading}>JOIN</button>
+            <div>
+              <input
+                type="text"
+                placeholder="Session Code"
+                required
+                @input=${(e: InputEvent) => this.sessionInput = (e.target as HTMLInputElement).value} 
+              />
+              <button @click=${this.joinSession} ?disabled=${this.loading || this.sessionInput.length === 0}>JOIN</button>
+            </div>
             <button @click=${this.createNewSession} ?disabled=${this.loading}>CREATE</button>
           </div>
         `}
@@ -90,6 +101,9 @@ export class Popup extends LitElement {
 
       chrome.tabs.sendMessage(tab.id!, {
         type: chromeMessages.JOIN_SESSION,
+        payload: {
+          code: this.sessionInput
+        }
       })
     } catch(err) {
       this.loading = false

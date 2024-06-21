@@ -1,6 +1,6 @@
 import { html, LitElement, PropertyValues } from "lit";
 import { createContext, provide } from "@lit/context";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import PartySocket from "partysocket";
 import { ChromeMessage, chromeMessages } from "@/core/chromeMessages";
 import { getSocketForSession } from "./client";
@@ -17,7 +17,8 @@ export enum SessionStatus {
 export type SessionState = {
   code: string | null
   socket: PartySocket | null
-  status: SessionStatus
+  status: SessionStatus,
+  addListener: (event: string, listener: (event: any) => void) => void
 }
 
 @customElement('mmp-session-provider')
@@ -26,31 +27,41 @@ export class SessionProvider extends LitElement {
   @property({ type: Object })
   public state!: SessionState
 
+  @state()
+  private listeners: Map<string, ((event: any) => void)[]> = new Map()
+
   connectedCallback(): void {
     super.connectedCallback()
 
     this.state = {
       code: null,
       socket: null,
-      status: SessionStatus.CONNECTING
+      status: SessionStatus.CONNECTING,
+      addListener: this.addListener.bind(this)
     }
-
-    console.log('Session provider connected')
     
-    chrome.runtime.onMessage.addListener((message: ChromeMessage, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener((message: ChromeMessage, _, sendResponse) => {
       const { type, payload } = message
       switch (type) {
         case chromeMessages.CREATE_SESSION:
           this.createNewSession()
           break
         case chromeMessages.JOIN_SESSION:
-          this.joinSession()
+          this.joinSession(payload.code)
           break
         case chromeMessages.FETCH_SESSION:
           sendResponse(this.state.code)
           break
       }
     })
+  }
+
+  private addListener = (event: string, listener: (event: any) => void) => {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, [])
+    }
+
+    this.listeners.get(event)?.push(listener)
   }
 
   private createNewSession = async () => {
@@ -77,13 +88,15 @@ export class SessionProvider extends LitElement {
     }
   }
 
-  private joinSession = async () => {
+  private joinSession = async (code: string) => {
+    if(!code) return
+
     try {
-      const socket = getSocketForSession('ABC123')
+      const socket = getSocketForSession(code)
 
       this.state = {
         ...this.state,
-        code: 'ABC123',
+        code,
         socket,
         status: SessionStatus.CONNECTED
       }
