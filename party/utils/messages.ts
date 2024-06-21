@@ -1,7 +1,12 @@
 export const socketMessages = {
-  PLAYER_CONNECTED: 'player:connected',
-  PLAYER_DISCONNECTED: 'player:disconnected',
-  LOAD_PLAYERS: 'load:players',
+  PLAYER_CONNECTED: 'socket:player:connected',
+  PLAYER_DISCONNECTED: 'socket:player:disconnected',
+  LOAD_PLAYERS: 'socket:load:players',
+  SESSION_STARTED: 'socket:session:started',
+  SHARED_STATE_UPDATED: 'socket:state:updated',
+
+  START_SESSION: 'socket:session:start',
+  SHARED_STATE_UPDATE: 'socket:state:update'
 }
 
 export type SocketMessages = {
@@ -23,23 +28,29 @@ export const json = (data: any) => {
   return JSON.stringify(data)
 }
 
-export const playerConnected = (player: Player) => {
+export const playerConnected = (players: Player[]) => {
   return json({
     type: socketMessages.PLAYER_CONNECTED,
-    payload: player
+    payload: {
+      players
+    }
   })
 }
 
-export const playerDisconnected = (player: Player) => {
+export const playerDisconnected = (players: Player[]) => {
   return json({
     type: socketMessages.PLAYER_DISCONNECTED,
-    payload: player
+    payload: {
+      players
+    }
   })
 }
 
 export const loadPlayers = (players: Player[]) => { 
   return json({
     type: socketMessages.LOAD_PLAYERS,
-    payload: players
+    payload: {
+      players
+    }
   })
 }

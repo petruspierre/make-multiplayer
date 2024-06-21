@@ -112,22 +112,14 @@ export class SessionProvider extends LitElement {
       const message: SocketMessages = JSON.parse(event.data)
 
       switch (message.type) {
+        case socketMessages.PLAYER_DISCONNECTED:
+        case socketMessages.PLAYER_CONNECTED:
         case socketMessages.LOAD_PLAYERS:
-          const players = message.payload;
+          const { players } = message.payload;
 
           this.state = produce(this.state, draft => {
             draft.self = players.find((player: any) => player.connectionId === socket.id)
             draft.players = players
-          })
-          break
-        case socketMessages.PLAYER_CONNECTED:
-          this.state = produce(this.state, draft => {
-            draft.players.push(message.payload)
-          })
-          break
-        case socketMessages.PLAYER_DISCONNECTED:
-          this.state = produce(this.state, draft => {
-            draft.players = draft.players.filter(player => player.connectionId !== message.payload.connectionId)
           })
           break
       }

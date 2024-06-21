@@ -23,7 +23,7 @@ export default class SessionServer implements Party.Server {
 
     this.players.push(player)
 
-    this.room.broadcast(playerConnected(player), [player.connectionId])
+    this.room.broadcast(playerConnected(this.players), [player.connectionId])
     connection.send(loadPlayers(this.players))
   }
 
@@ -34,8 +34,18 @@ export default class SessionServer implements Party.Server {
 
     if (player) {
       this.players = this.players.filter(player => player.connectionId !== connection.id)
-      this.room.broadcast(playerDisconnected(player))
+
+      // If the host disconnected, assign the host role to the next player
+      if (player.isHost && this.players.length > 0) {
+        this.players[0].isHost = true
+      }
+
+      this.room.broadcast(playerDisconnected(this.players))
     }
+  }
+
+  onMessage(message: string, sender: Party.Connection): void | Promise<void> {
+    console.log(`Connection ${sender.id} sent message: ${message}`)
   }
 }
 
