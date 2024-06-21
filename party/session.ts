@@ -17,7 +17,8 @@ export default class SessionServer implements Party.Server {
 
     const player: Player = {
       connectionId: connection.id,
-      name: 'Player ' + this.players.length
+      name: 'Player ' + this.players.length,
+      isHost: this.players.length === 0
     }
 
     this.players.push(player)

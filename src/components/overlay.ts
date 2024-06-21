@@ -13,7 +13,7 @@ export enum OverlayStatus {
 @customElement('mmp-overlay')
 export class Overlay extends LitElement {
   @property()
-  status: OverlayStatus = OverlayStatus.NOT_CONNECTED;
+  status: OverlayStatus = OverlayStatus.NOT_STARTED;
 
   @consume({ context: sessionContext, subscribe: true })
   @state()
@@ -36,6 +36,29 @@ export class Overlay extends LitElement {
     }
   }
 
+  get players() {
+    return this.sessionState.players
+  }
+
+  get isHost() {
+    return this.sessionState.self?.isHost
+  }
+
+  notStartedTemplate() {
+    if (this.players.length < 1) {
+      return html`
+        <p class="title">Obtendo dados da sessão...</p>
+      `
+    }
+
+    return html`
+      <div>
+        <p class="title">Aguardando início da sessão...</p>
+        <span>${this.players.length} conectados.</span>
+      </div>
+    `
+  }
+
   render() {
     if (this.status === OverlayStatus.NOT_CONNECTED) {
       return html``
@@ -44,9 +67,12 @@ export class Overlay extends LitElement {
     return html`
       <div class="background">
         <div class="content">
-          ${this.status === OverlayStatus.NOT_STARTED ? html`
-            <h2>Waiting for more players</h2>
-          ` : ''}
+          <div class="header">
+            <span>SESSÃO ${this.sessionState.code}</span>
+          </div>
+          <div class="body">
+            ${this.status === OverlayStatus.NOT_STARTED ? this.notStartedTemplate() : ''}
+          </div>
         </div>
       </div>
     `
@@ -59,8 +85,34 @@ export class Overlay extends LitElement {
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(2px);
       z-index: 1000;
+    }
+    
+    .content {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      color: white;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .body .title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: bold;
     }
   `
 }

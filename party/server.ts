@@ -30,7 +30,7 @@ export default class MakeMultiplayerMainServer implements Party.Server {
         return error('Failed to generate session code')
       }
 
-      return json({ code })
+      return json({ code: 'ABC123' })
     }
 
     if (req.method === 'GET') {

@@ -12,6 +12,7 @@ export type SocketMessages = {
 export type Player = {
   connectionId: string
   name: string
+  isHost: boolean
 }
 
 export type Session = {
