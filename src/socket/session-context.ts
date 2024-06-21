@@ -111,8 +111,11 @@ export class SessionProvider extends LitElement {
 
       switch (message.type) {
         case socketMessages.LOAD_PLAYERS:
+          const players = message.payload;
+
           this.state = produce(this.state, draft => {
-            draft.players = message.payload
+            draft.self = players.find((player: any) => player.connectionId === socket.id)
+            draft.players = players
           })
           break
         case socketMessages.PLAYER_CONNECTED:

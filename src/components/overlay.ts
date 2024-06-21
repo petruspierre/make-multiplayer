@@ -13,7 +13,7 @@ export enum OverlayStatus {
 @customElement('mmp-overlay')
 export class Overlay extends LitElement {
   @property()
-  status: OverlayStatus = OverlayStatus.NOT_STARTED;
+  status: OverlayStatus = OverlayStatus.NOT_CONNECTED;
 
   @consume({ context: sessionContext, subscribe: true })
   @state()
@@ -53,8 +53,22 @@ export class Overlay extends LitElement {
 
     return html`
       <div>
-        <p class="title">Aguardando início da sessão...</p>
+        ${this.players.length === 1 ? html`
+          <p class="title">Aguardando mais jogadores...</p>
+        ` : this.isHost ? html`
+          <p class="title">Inicie quando estiver pronto</p>
+        ` : html`
+          <p class="title">Aguardando início da sessão...</p>
+        `}
         <span>${this.players.length} conectados.</span>
+
+        <div class="actions">
+          <button>Sair da sessão</button>
+
+          ${this.isHost ? html`
+            <button ?disabled=${this.players.length < 2}>Iniciar sessão</button>
+          ` : ''}
+        </div>
       </div>
     `
   }
