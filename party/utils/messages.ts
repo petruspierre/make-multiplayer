@@ -6,6 +6,7 @@ export const socketMessages = {
   PLAYER_STATE_UPDATED: 'socket:state:updated',
 
   START_SESSION: 'socket:session:start',
+  PLAYER_STATE_HYDRATE: 'socket:state:hydrate',
   PLAYER_STATE_UPDATE: 'socket:state:update'
 }
 

@@ -1,3 +1,4 @@
+import { Player } from "party/utils/messages";
 import { letrinhaEvents } from "./letrinha-events";
 
 enum Guess {
@@ -75,4 +76,17 @@ export function run() {
     attributes: true,
     attributeFilter: ['class']
   })
+}
+
+export function getInitialState(players: Player[]) {
+  const maxAttempts = Array.from(document.querySelectorAll('div[class*="FieldWrapper"]')).length
+
+  return players.reduce((acc, player) => {
+    acc[player.connectionId] = {
+      currentAttempt: 0,
+      maxAttempts: maxAttempts,
+      lastValues: []
+    }
+    return acc;
+  }, {} as Record<string, LetrinhaGameState>)
 }

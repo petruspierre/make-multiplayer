@@ -154,6 +154,7 @@ export class SessionProvider extends LitElement {
   }
 
   sendMessage = (message: SocketMessages) => {
+    console.log('Sending message', message)
     this.state.socket?.send(JSON.stringify(message))
   }
 

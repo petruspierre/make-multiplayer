@@ -66,6 +66,10 @@ export default class SessionServer implements Party.Server {
           }
         }))
         break
+      case socketMessages.PLAYER_STATE_HYDRATE:
+        const { playerState } = message.payload
+        this.playerState = playerState
+        break
     }
   }
 }

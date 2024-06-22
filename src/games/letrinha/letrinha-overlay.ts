@@ -20,6 +20,20 @@ export class LetrinhaOverlay extends LitElement {
 
     script.run();
 
+    const initialPlayerState = script.getInitialState(this.sessionState.players)
+    this.playerState = initialPlayerState;
+
+    const isHost = this.sessionState.self?.isHost;
+
+    if (isHost) {
+      this.sessionState.sendMessage({
+        type: socketMessages.PLAYER_STATE_HYDRATE,
+        payload: {
+          playerState: initialPlayerState
+        }
+      })
+    }
+
     window.addEventListener(letrinhaEvents.NEW_GUESS as any, (event: CustomEvent) => {
       console.log('New guess', event.detail.gameState)
       this.sessionState.sendMessage({
