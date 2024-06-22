@@ -5,6 +5,7 @@ import '../../components/overlay'
 import '../../socket/session-context'
 import '../../games/letrinha/letrinha-overlay'
 import '../../components/ui/draggable-box'
+import '../../components/ui/typography'
 
 type Precondition = {
   query: string;
@@ -19,6 +20,7 @@ type GameIntegration = {
   preconditions: Precondition[];
   pickStyles?: {
     primaryFont?: string;
+    primaryColor?: string;
   };
   timeout: number;
 }
@@ -50,7 +52,8 @@ const supportedGames: GameIntegration[] = [
       }
     ],
     pickStyles: {
-      primaryFont: 'button[title="Enviar palavra"]'
+      primaryFont: 'button[title="Enviar palavra"]',
+      primaryColor: 'body'
     },
     timeout: 1000
   }
@@ -102,16 +105,18 @@ function insertOverlay() {
         clearInterval(checkPreconditions)
 
         if (pickStyles) {
-          const root = document.querySelector(':root');
-          console.log('Setting custom styles')
+          const root = document.querySelector(':root') as HTMLElement;
 
-          if (root) {
-            if (pickStyles.primaryFont) {
-              const element = document.querySelector(pickStyles.primaryFont)
-              const elementStyle = getComputedStyle(element as Element)
-              console.log('Setting primary font', elementStyle.fontFamily)
-              root.style.setProperty('--mmp-primary-font', elementStyle.fontFamily)
-            }
+          if (pickStyles.primaryFont) {
+            const element = document.querySelector(pickStyles.primaryFont)
+            const elementStyle = getComputedStyle(element as Element)
+            root.style.setProperty('--mmp-font-primary', elementStyle.fontFamily)
+          }
+
+          if (pickStyles.primaryColor) {
+            const element = document.querySelector(pickStyles.primaryColor)
+            const elementStyle = getComputedStyle(element as Element)
+            root.style.setProperty('--mmp-color-primary', elementStyle.backgroundColor)
           }
         }
 

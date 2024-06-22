@@ -57,37 +57,72 @@ export class LetrinhaOverlay extends LitElement {
     return html`
       <mmp-draggable-box>
         <div slot="header">
-          <span>Letrinha</span>
+          <mmp-typography variant="h3">Letrinha</mmp-typography>
         </div>
         <div slot="body">
-          ${this.sessionState.players.map(player => {
-            const state = this.playerState[player.connectionId] || {
-              currentAttempt: 1,
-              maxAttempts: 6,
-              lastValues: [0,1,1,2,0]
-            };
-            return html`
-              <div>
-                <p>${player.name} - ${state.currentAttempt}/${state.maxAttempts}</p>
-                <div class="tile-wrapper">
-                  ${state.lastValues?.map((value: script.Guess) => html`
-                    <div class=${classMap({
-                      wrong: value === script.Guess.WRONG,
-                      partial: value === script.Guess.PARTIAL,
-                      exact: value === script.Guess.EXACT,
-                      tile: true
-                    })}></div>
-                  `)}
+          <div class="players-container">
+            ${this.sessionState.players.map(player => {
+              const state = this.playerState[player.connectionId] || {
+                currentAttempt: 1,
+                maxAttempts: 6,
+                lastValues: [0,1,1,2,0]
+              };
+
+              return html`
+                <div class="player-wrapper">
+                  <div class="player-info">
+                    <mmp-typography variant="body1">${player.name}</mmp-typography>
+
+                    <mmp-typography class="player-position">2°</mmp-typography>
+                  </div>
+                  <div class="player-stats">
+                    <mmp-typography variant="body1">${state.currentAttempt}/${state.maxAttempts} TENTATIVAS</mmp-typography>
+
+                    <div class="tile-wrapper">
+                      ${state.lastValues?.map((value: script.Guess) => html`
+                        <div class=${classMap({
+                          wrong: value === script.Guess.WRONG,
+                          partial: value === script.Guess.PARTIAL,
+                          exact: value === script.Guess.EXACT,
+                          tile: true
+                        })}></div>
+                      `)}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            `
-          })}
+              `
+            })}
+          </div>
         </div>
       </mmp-draggable-box>
     `
   }
 
   static styles = css`
+    .players-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .player-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .player-info {}
+
+    .player-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .player-wrapper .player-info .player-position {
+      font-size: 2rem;
+    }
+
     .tile-wrapper {
       display: flex;
       gap: 2px;
@@ -99,15 +134,15 @@ export class LetrinhaOverlay extends LitElement {
     }
 
     .wrong {
-      background: red;
+      background: #D9D9D9;
     }
 
     .partial {
-      background: yellow;
+      background: rgb(244, 173, 35);
     }
 
     .exact {
-      background: green;
+      background: rgb(39, 177, 94);
     }
 
     p {

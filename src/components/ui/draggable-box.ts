@@ -36,18 +36,17 @@ export class DraggableBox extends LitElement {
   }
 
   dragStart(event: MouseEvent) {
-    console.log('Drag start')
-
     this.lastX = event.clientX;
     this.lastY = event.clientY;
 
     this.header.classList.add('dragging');
+    this.box.classList.add('dragging');
     this.header.addEventListener('mousemove', this.dragMove.bind(this));
   }
   
   dragEnd() {
-    console.log('Drag end')
     this.header.classList.remove('dragging');
+    this.box.classList.remove('dragging');
     this.header.removeEventListener('mousemove', this.dragMove.bind(this));
   }
   
@@ -84,18 +83,21 @@ export class DraggableBox extends LitElement {
       position: absolute;
       top: 8px;
       right: 8px;
-      width: 300px;
-      height: 200px;
+      width: 200px;
       background-color: #fff;
-      border: 1px solid dodgerblue;
-      border-radius: 5px;
+      border: 1px solid var(--mmp-color-primary, dodgerblue);
+      border-radius: 16px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
 
     .box-header {
-      color: #fff;
-      background-color: dodgerblue;
+      color: var(--mmp-color-primary, dodgerblue);
+      border-bottom: 1px solid var(--mmp-color-primary, dodgerblue);
       padding: 10px 15px;
+
+      display: flex;
+      justify-content: center;
     }
 
     .box-body {
@@ -104,6 +106,10 @@ export class DraggableBox extends LitElement {
 
     .dragging {
       cursor: move !important;
+    }
+
+    .box.dragging {
+      opacity: 0.8;
     }
   `
 }
