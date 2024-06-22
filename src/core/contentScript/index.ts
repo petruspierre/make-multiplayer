@@ -32,10 +32,20 @@ const supportedGames: GameIntegration[] = [
     url: 'https://letrinha.petrus.dev.br',
     root: 'body',
     overlayElement: 'mmp-letrinha-overlay',
-    preconditions: [{
-      query: 'styles__FieldWrapper-sc-2t4gk7-2 iMRUMe',
-      quantity: (elementsFound) => elementsFound === 5 || elementsFound === 6,
-    }],
+    preconditions: [
+      {
+        query: 'section[class*="FieldsContainer"]',
+        quantity: 1
+      }, 
+      {
+        query: 'div[class*="FieldWrapper"]',
+        quantity: (elementsFound) => elementsFound === 6 || elementsFound === 7,
+      },
+      {
+        query: 'div[class*="FieldWrapper"] button',
+        quantity: (elementsFound) => elementsFound === 6 * 5 || elementsFound === 7 * 6,
+      }
+    ],
     timeout: 1000
   }
 ]

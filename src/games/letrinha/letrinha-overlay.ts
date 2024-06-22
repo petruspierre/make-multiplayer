@@ -2,6 +2,8 @@ import { sessionContext, SessionState } from "@/socket/session-context";
 import { consume } from "@lit/context";
 import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import * as script from "./letrinha-script";
+import { letrinhaEvents } from "./letrinha-events";
 
 @customElement('mmp-letrinha-overlay')
 export class LetrinhaOverlay extends LitElement {
@@ -11,6 +13,12 @@ export class LetrinhaOverlay extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+
+    script.run();
+
+    window.addEventListener(letrinhaEvents.NEW_GUESS as any, (event: CustomEvent) => {
+      console.log(event)
+    })
   }
 
   render() {
