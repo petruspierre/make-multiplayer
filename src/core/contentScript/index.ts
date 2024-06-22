@@ -86,11 +86,9 @@ function insertOverlay() {
         clearInterval(checkPreconditions)
 
         console.log('All conditions met. Inserting game overlay...')
-        // if (overlayElement) {
-        //   // Insert game overlay to root overlay
-        //   const gameOverlay = document.createElement(overlayElement)
-        //   rootOverlay.appendChild(gameOverlay)
-        // }
+        if (overlayElement) {
+          rootOverlay.overlayElementTag = overlayElement
+        }
 
         return
       }

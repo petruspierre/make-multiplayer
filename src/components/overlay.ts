@@ -2,6 +2,8 @@ import { sessionContext, SessionState, SessionStatus } from "@/socket/session-co
 import { consume } from "@lit/context";
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { socketMessages } from "party/utils/messages";
+import { unsafeStatic } from 'lit/static-html.js'
 
 export enum OverlayStatus {
   NOT_CONNECTED = 'not_connected',
@@ -19,6 +21,9 @@ export class Overlay extends LitElement {
   @state()
   sessionState!: SessionState;
 
+  @property()
+  overlayElementTag: string = ''
+
   connectedCallback(): void {
     super.connectedCallback();
 
@@ -29,7 +34,16 @@ export class Overlay extends LitElement {
     super.updated(_changedProperties);
 
     if (_changedProperties.has('sessionState')) {
-      console.log('Session status updated to ', this.sessionState.status)
+      const previousStatus = _changedProperties.get('sessionState')?.status
+      console.log('Session status updated from ', previousStatus, ' to ', this.sessionState.status)
+      if (previousStatus === SessionStatus.NOT_CONNECTED && this.sessionState.status === SessionStatus.CONNECTED) {
+        console.log('Start listening for session started')
+        this.sessionState.addListener(socketMessages.SESSION_STARTED, () => {
+          console.log('Session started')
+          this.status = OverlayStatus.IN_PROGRESS
+        })
+      }
+
       if (this.sessionState.status === SessionStatus.CONNECTED) {
         this.status = OverlayStatus.NOT_STARTED
       }
@@ -70,16 +84,29 @@ export class Overlay extends LitElement {
           <button @click=${() => this.sessionState.leaveSession()}>Sair da sessão</button>
 
           ${this.isHost ? html`
-            <button ?disabled=${this.players.length < 2}>Iniciar sessão</button>
+            <button ?disabled=${this.players.length < 2} @click=${this.startSession}>Iniciar sessão</button>
           ` : ''}
         </div>
       </div>
     `
   }
 
+  private startSession() {
+    this.sessionState.sendMessage({
+      type: socketMessages.START_SESSION,
+      payload: null
+    })
+  }
+
   render() {
     if (this.status === OverlayStatus.NOT_CONNECTED) {
       return html``
+    }
+
+    if (this.status === OverlayStatus.IN_PROGRESS) {
+      return html`
+        <mmp-letrinha-overlay></mmp-letrinha-overlay>
+      `
     }
 
     return html`

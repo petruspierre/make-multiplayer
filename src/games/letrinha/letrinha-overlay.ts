@@ -1,8 +1,14 @@
+import { sessionContext, SessionState } from "@/socket/session-context";
+import { consume } from "@lit/context";
 import { css, html, LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 
 @customElement('mmp-letrinha-overlay')
 export class LetrinhaOverlay extends LitElement {
+  @consume({ context: sessionContext, subscribe: true })
+  @state()
+  private sessionState!: SessionState;
+
   connectedCallback(): void {
     super.connectedCallback();
   }
@@ -11,7 +17,15 @@ export class LetrinhaOverlay extends LitElement {
     return html`
       <div class="container">
         <div class="content">
-          <p>Attempts remaining: 7</p>
+          <div class="header">
+            <span>Letrinha</span>
+            <button>Sair</button>
+          </div>
+          <div class="body">
+            ${this.sessionState.players.map(player => html`
+              <p>${player.name}</p>
+            `)}
+          </div>
         </div>
       </div>
     `

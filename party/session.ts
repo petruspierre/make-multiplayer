@@ -1,5 +1,5 @@
 import type * as Party from 'partykit/server'
-import { loadPlayers, Player, playerConnected, playerDisconnected } from './utils/messages'
+import { json, loadPlayers, Player, playerConnected, playerDisconnected, socketMessages, SocketMessages } from './utils/messages'
 
 export default class SessionServer implements Party.Server {
   players: Player[] = []
@@ -44,8 +44,18 @@ export default class SessionServer implements Party.Server {
     }
   }
 
-  onMessage(message: string, sender: Party.Connection): void | Promise<void> {
-    console.log(`Connection ${sender.id} sent message: ${message}`)
+  onMessage(content: string, sender: Party.Connection): void | Promise<void> {
+    const message: SocketMessages = JSON.parse(content)
+
+    console.log('Received message', message)
+
+    switch (message.type) {
+      case socketMessages.START_SESSION:
+        this.room.broadcast(json({
+          type: socketMessages.SESSION_STARTED
+        }))
+        break
+    }
   }
 }
 

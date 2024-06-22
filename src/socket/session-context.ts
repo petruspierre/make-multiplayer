@@ -5,15 +5,9 @@ import PartySocket from "partysocket";
 import { ChromeMessage, chromeMessages } from "@/core/chromeMessages";
 import { getSocketForSession } from "./client";
 import { produce } from "immer";
-import { socketMessages, SocketMessages } from '../../party/utils/messages'
+import { Player, socketMessages, SocketMessages } from '../../party/utils/messages'
 
 export const sessionContext = createContext<SessionState>(Symbol.for("game-context"))
-
-type Player = {
-  connectionId: string;
-  username: string;
-  isHost: boolean;
-}
 
 export enum SessionStatus {
   NOT_CONNECTED = 'not_connected',
@@ -28,6 +22,8 @@ export type SessionState = {
   players: Player[]
   self?: Player
   leaveSession: () => void
+  sendMessage: (message: SocketMessages) => void
+  addListener: (event: string, callback: (event: MessageEvent) => void) => void
 }
 
 @customElement('mmp-session-provider')
@@ -35,6 +31,9 @@ export class SessionProvider extends LitElement {
   @provide({ context: sessionContext })
   @property({ type: Object })
   public state!: SessionState
+
+  @state()
+  private listeners: Map<string, (event: MessageEvent) => void> = new Map()
 
   connectedCallback(): void {
     super.connectedCallback()
@@ -44,7 +43,9 @@ export class SessionProvider extends LitElement {
       socket: null,
       status: SessionStatus.NOT_CONNECTED,
       players: [],
-      leaveSession: this.leaveSession.bind(this)
+      sendMessage: this.sendMessage.bind(this),
+      leaveSession: this.leaveSession.bind(this),
+      addListener: this.addListener.bind(this)
     }
     
     chrome.runtime.onMessage.addListener((message: ChromeMessage, _, sendResponse) => {
@@ -110,6 +111,15 @@ export class SessionProvider extends LitElement {
 
     socket.onmessage = (event) => {
       const message: SocketMessages = JSON.parse(event.data)
+      console.log('Received socket message', message)
+
+      console.log(this.listeners.keys())
+      this.listeners.forEach((callback, key) => {
+        if (message.type === key) {
+          console.log('Caught listener for event', message.type)
+          callback(event)
+        }
+      })
 
       switch (message.type) {
         case socketMessages.PLAYER_DISCONNECTED:
@@ -128,6 +138,10 @@ export class SessionProvider extends LitElement {
     return socket
   }
 
+  addListener = (event: string, callback: (event: MessageEvent) => void) => {
+    this.listeners.set(event, callback)
+  }
+
   leaveSession = () => {
     this.state.socket?.close()
     this.state = produce(this.state, draft => {
@@ -137,6 +151,10 @@ export class SessionProvider extends LitElement {
       draft.players = []
       draft.leaveSession = this.leaveSession.bind(this)
     })
+  }
+
+  sendMessage = (message: SocketMessages) => {
+    this.state.socket?.send(JSON.stringify(message))
   }
 
   render() {

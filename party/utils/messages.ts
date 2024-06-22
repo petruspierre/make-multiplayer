@@ -10,7 +10,7 @@ export const socketMessages = {
 }
 
 export type SocketMessages = {
-  type: keyof typeof socketMessages;
+  type: string;
   payload: any;
 }
 
