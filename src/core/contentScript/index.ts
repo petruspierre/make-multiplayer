@@ -4,6 +4,7 @@ import { SessionProvider } from '../../socket/session-context';
 import '../../components/overlay'
 import '../../socket/session-context'
 import '../../games/letrinha/letrinha-overlay'
+import '../../components/ui/draggable-box'
 
 type Precondition = {
   query: string;
@@ -16,6 +17,9 @@ type GameIntegration = {
   root: string;
   overlayElement?: string;
   preconditions: Precondition[];
+  pickStyles?: {
+    primaryFont?: string;
+  };
   timeout: number;
 }
 
@@ -31,7 +35,6 @@ const supportedGames: GameIntegration[] = [
     name: 'Letrinha',
     url: 'https://letrinha.petrus.dev.br',
     root: 'body',
-    overlayElement: 'mmp-letrinha-overlay',
     preconditions: [
       {
         query: 'div[class*="FieldWrapper"]',
@@ -46,6 +49,9 @@ const supportedGames: GameIntegration[] = [
         quantity: 1
       }
     ],
+    pickStyles: {
+      primaryFont: 'button[title="Enviar palavra"]'
+    },
     timeout: 1000
   }
 ]
@@ -59,7 +65,7 @@ let sessionProvider: SessionProvider;
 
 function insertOverlay() {
   if (game) {
-    const { name, overlayElement, preconditions, root, timeout } = game
+    const { name, preconditions, root, timeout, pickStyles } = game
 
     console.log(`Game detected: ${name}`)
     console.log(`Start checking ${preconditions.length} preconditions...`)
@@ -95,9 +101,18 @@ function insertOverlay() {
       if (Array.from(conditionsMet.values()).length === preconditions.length) {
         clearInterval(checkPreconditions)
 
-        console.log('All conditions met. Inserting game overlay...')
-        if (overlayElement) {
-          rootOverlay.overlayElementTag = overlayElement
+        if (pickStyles) {
+          const root = document.querySelector(':root');
+          console.log('Setting custom styles')
+
+          if (root) {
+            if (pickStyles.primaryFont) {
+              const element = document.querySelector(pickStyles.primaryFont)
+              const elementStyle = getComputedStyle(element as Element)
+              console.log('Setting primary font', elementStyle.fontFamily)
+              root.style.setProperty('--mmp-primary-font', elementStyle.fontFamily)
+            }
+          }
         }
 
         return

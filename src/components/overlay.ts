@@ -100,7 +100,7 @@ export class Overlay extends LitElement {
 
   render() {
     if (this.status === OverlayStatus.NOT_CONNECTED) {
-      return html``
+      return html`<mmp-letrinha-overlay></mmp-letrinha-overlay>`
     }
 
     if (this.status === OverlayStatus.IN_PROGRESS) {

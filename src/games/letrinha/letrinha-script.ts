@@ -32,7 +32,7 @@ export function run() {
 
   const sendButton = document.querySelector('button[title="Enviar palavra"]')
   sendButton?.addEventListener('click', () => {
-    setTimeout(() => retrieveGameState(), 500)
+    setTimeout(() => retrieveGameState(), 100)
   })
 }
 

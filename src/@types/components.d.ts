@@ -13,5 +13,6 @@ declare global {
     'mmp-popup': Popup;
     'mmp-options': Options;
     'mmp-session-provider': SessionProvider;
+    'mmp-draggable-box': DraggableBox;
   }
 }

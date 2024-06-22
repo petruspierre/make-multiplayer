@@ -42,7 +42,15 @@ export class SessionProvider extends LitElement {
       code: null,
       socket: null,
       status: SessionStatus.NOT_CONNECTED,
-      players: [],
+      players: [{
+        connectionId: '123',
+        isHost: true,
+        name: 'Host'
+      }, {
+        connectionId: '1234',
+        isHost: false,
+        name: 'Player'
+      }],
       sendMessage: this.sendMessage.bind(this),
       leaveSession: this.leaveSession.bind(this),
       addListener: this.addListener.bind(this)
