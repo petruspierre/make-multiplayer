@@ -3,7 +3,6 @@ import { consume } from "@lit/context";
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { socketMessages } from "party/utils/messages";
-import { unsafeStatic } from 'lit/static-html.js'
 
 export enum OverlayStatus {
   NOT_CONNECTED = 'not_connected',
@@ -100,7 +99,7 @@ export class Overlay extends LitElement {
 
   render() {
     if (this.status === OverlayStatus.NOT_CONNECTED) {
-      return html`<mmp-letrinha-overlay></mmp-letrinha-overlay>`
+      return html``
     }
 
     if (this.status === OverlayStatus.IN_PROGRESS) {

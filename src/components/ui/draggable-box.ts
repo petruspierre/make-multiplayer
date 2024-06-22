@@ -82,8 +82,7 @@ export class DraggableBox extends LitElement {
     .box {
       position: absolute;
       top: 8px;
-      right: 8px;
-      width: 200px;
+      left: 8px;
       background-color: #fff;
       border: 1px solid var(--mmp-color-primary, dodgerblue);
       border-radius: 16px;

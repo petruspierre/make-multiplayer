@@ -19,38 +19,38 @@ export class LetrinhaOverlay extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
 
-    // script.run();
+    script.run();
 
-    // const initialPlayerState = script.getInitialState(this.sessionState.players)
-    // this.playerState = initialPlayerState;
+    const initialPlayerState = script.getInitialState(this.sessionState.players)
+    this.playerState = initialPlayerState;
 
-    // const isHost = this.sessionState.self?.isHost;
+    const isHost = this.sessionState.self?.isHost;
 
-    // if (isHost) {
-    //   this.sessionState.sendMessage({
-    //     type: socketMessages.PLAYER_STATE_HYDRATE,
-    //     payload: {
-    //       playerState: initialPlayerState
-    //     }
-    //   })
-    // }
+    if (isHost) {
+      this.sessionState.sendMessage({
+        type: socketMessages.PLAYER_STATE_HYDRATE,
+        payload: {
+          playerState: initialPlayerState
+        }
+      })
+    }
 
-    // window.addEventListener(letrinhaEvents.NEW_GUESS as any, (event: CustomEvent) => {
-    //   console.log('New guess', event.detail.gameState)
-    //   this.sessionState.sendMessage({
-    //     type: socketMessages.PLAYER_STATE_UPDATE,
-    //     payload: {
-    //       gameState: event.detail.gameState
-    //     }
-    //   })
-    // })
+    window.addEventListener(letrinhaEvents.NEW_GUESS as any, (event: CustomEvent) => {
+      console.log('New guess', event.detail.gameState)
+      this.sessionState.sendMessage({
+        type: socketMessages.PLAYER_STATE_UPDATE,
+        payload: {
+          gameState: event.detail.gameState
+        }
+      })
+    })
 
-    // this.sessionState.addListener(socketMessages.PLAYER_STATE_UPDATED, (event: SocketMessages) => {
-    //   console.log('Player state updated', event.payload)
-    //   const { playerState } = event.payload;
+    this.sessionState.addListener(socketMessages.PLAYER_STATE_UPDATED, (event: SocketMessages) => {
+      console.log('Player state updated', event.payload)
+      const { playerState } = event.payload;
 
-    //   this.playerState = playerState;
-    // })
+      this.playerState = playerState;
+    })
   }
 
   render() {
@@ -64,8 +64,8 @@ export class LetrinhaOverlay extends LitElement {
             ${this.sessionState.players.map(player => {
               const state = this.playerState[player.connectionId] || {
                 currentAttempt: 1,
-                maxAttempts: 6,
-                lastValues: [0,1,1,2,0]
+                maxAttempts: 7,
+                lastValues: []
               };
 
               return html`
@@ -73,12 +73,18 @@ export class LetrinhaOverlay extends LitElement {
                   <div class="player-info">
                     <mmp-typography variant="body1">${player.name}</mmp-typography>
 
-                    <mmp-typography class="player-position">2°</mmp-typography>
+                    <!-- <mmp-typography class="player-position">2°</mmp-typography> -->
                   </div>
                   <div class="player-stats">
                     <mmp-typography variant="body1">${state.currentAttempt}/${state.maxAttempts} TENTATIVAS</mmp-typography>
 
                     <div class="tile-wrapper">
+                      ${!state.lastValues || state.lastValues.length === 0 ?
+                        Array(state.maxAttempts - 1)
+                          .fill(0)
+                          .map(() => html`<div class="tile">-</div>`)
+                        : ''}
+
                       ${state.lastValues?.map((value: script.Guess) => html`
                         <div class=${classMap({
                           wrong: value === script.Guess.WRONG,
@@ -108,6 +114,12 @@ export class LetrinhaOverlay extends LitElement {
     .player-wrapper {
       display: flex;
       justify-content: space-between;
+      gap: 8px;
+    }
+
+    .player-wrapper:not(:last-child) {
+      padding-bottom: 8px;
+      border-bottom: 1px solid #D9D9D9;
     }
 
     .player-info {}
