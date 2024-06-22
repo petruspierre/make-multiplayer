@@ -23,7 +23,7 @@ export type SessionState = {
   self?: Player
   leaveSession: () => void
   sendMessage: (message: SocketMessages) => void
-  addListener: (event: string, callback: (event: MessageEvent) => void) => void
+  addListener: (event: string, callback: (event: SocketMessages) => void) => void
 }
 
 @customElement('mmp-session-provider')
@@ -33,7 +33,7 @@ export class SessionProvider extends LitElement {
   public state!: SessionState
 
   @state()
-  private listeners: Map<string, (event: MessageEvent) => void> = new Map()
+  private listeners: Map<string, (event: SocketMessages) => void> = new Map()
 
   connectedCallback(): void {
     super.connectedCallback()
@@ -117,7 +117,7 @@ export class SessionProvider extends LitElement {
       this.listeners.forEach((callback, key) => {
         if (message.type === key) {
           console.log('Caught listener for event', message.type)
-          callback(event)
+          callback(message)
         }
       })
 
@@ -138,7 +138,7 @@ export class SessionProvider extends LitElement {
     return socket
   }
 
-  addListener = (event: string, callback: (event: MessageEvent) => void) => {
+  addListener = (event: string, callback: (event: SocketMessages) => void) => {
     this.listeners.set(event, callback)
   }
 

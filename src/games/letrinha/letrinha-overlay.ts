@@ -4,6 +4,7 @@ import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import * as script from "./letrinha-script";
 import { letrinhaEvents } from "./letrinha-events";
+import { SocketMessages, socketMessages } from "party/utils/messages";
 
 @customElement('mmp-letrinha-overlay')
 export class LetrinhaOverlay extends LitElement {
@@ -11,13 +12,29 @@ export class LetrinhaOverlay extends LitElement {
   @state()
   private sessionState!: SessionState;
 
+  @state()
+  private playerState: Record<string, script.LetrinhaGameState> = {}
+  
   connectedCallback(): void {
     super.connectedCallback();
 
     script.run();
 
     window.addEventListener(letrinhaEvents.NEW_GUESS as any, (event: CustomEvent) => {
-      console.log(event)
+      console.log('New guess', event.detail.gameState)
+      this.sessionState.sendMessage({
+        type: socketMessages.PLAYER_STATE_UPDATE,
+        payload: {
+          gameState: event.detail.gameState
+        }
+      })
+    })
+
+    this.sessionState.addListener(socketMessages.PLAYER_STATE_UPDATED, (event: SocketMessages) => {
+      console.log('Player state updated', event.payload)
+      const { playerState } = event.payload;
+
+      this.playerState = playerState;
     })
   }
 
@@ -30,9 +47,12 @@ export class LetrinhaOverlay extends LitElement {
             <button>Sair</button>
           </div>
           <div class="body">
-            ${this.sessionState.players.map(player => html`
-              <p>${player.name}</p>
-            `)}
+            ${this.sessionState.players.map(player => {
+              const state = this.playerState[player.connectionId] || {};
+              return html`
+                <p>${player.name} - ${state.currentAttempt}/${state.maxAttempts}</p>
+              `
+            })}
           </div>
         </div>
       </div>

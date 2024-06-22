@@ -3,10 +3,10 @@ export const socketMessages = {
   PLAYER_DISCONNECTED: 'socket:player:disconnected',
   LOAD_PLAYERS: 'socket:load:players',
   SESSION_STARTED: 'socket:session:started',
-  SHARED_STATE_UPDATED: 'socket:state:updated',
+  PLAYER_STATE_UPDATED: 'socket:state:updated',
 
   START_SESSION: 'socket:session:start',
-  SHARED_STATE_UPDATE: 'socket:state:update'
+  PLAYER_STATE_UPDATE: 'socket:state:update'
 }
 
 export type SocketMessages = {
