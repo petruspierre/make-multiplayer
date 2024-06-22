@@ -20,21 +20,11 @@ export class Overlay extends LitElement {
   @state()
   sessionState!: SessionState;
 
-  @property()
-  overlayElementTag: string = ''
-
-  connectedCallback(): void {
-    super.connectedCallback();
-
-    console.log('Overlay connected')
-  }
-
   protected updated(_changedProperties: PropertyValues): void {
     super.updated(_changedProperties);
 
     if (_changedProperties.has('sessionState')) {
       const previousStatus = _changedProperties.get('sessionState')?.status
-      console.log('Session status updated from ', previousStatus, ' to ', this.sessionState.status)
       if (previousStatus === SessionStatus.NOT_CONNECTED && this.sessionState.status === SessionStatus.CONNECTED) {
         console.log('Start listening for session started')
         this.sessionState.addListener(socketMessages.SESSION_STARTED, () => {
@@ -64,20 +54,23 @@ export class Overlay extends LitElement {
   notStartedTemplate() {
     if (this.players.length < 1) {
       return html`
-        <p class="title">Obtendo dados da sessão...</p>
+        <mmp-typography variant="h2">Obtendo dados da sessão...</mmp-typography>
       `
     }
 
     return html`
-      <div>
+      <div class="not-started">
         ${this.players.length === 1 ? html`
-          <p class="title">Aguardando mais jogadores...</p>
+          <mmp-typography variant="h2">Aguardando mais jogadores...</mmp-typography>
         ` : this.isHost ? html`
-          <p class="title">Inicie quando estiver pronto</p>
+          <mmp-typography variant="h2">Inicie quando estiver pronto</mmp-typography>
         ` : html`
-          <p class="title">Aguardando início da sessão...</p>
+          <mmp-typography variant="h2">Aguardando início da sessão...</mmp-typography>
         `}
-        <span>${this.players.length} conectados.</span>
+
+        <div class="info">
+          <mmp-typography variant="body1">${this.players.length} conectado${this.players.length !== 1 ? 's' : ''}.</mmp-typography>
+        </div>
 
         <div class="actions">
           <button @click=${() => this.sessionState.leaveSession()}>Sair da sessão</button>
@@ -112,8 +105,9 @@ export class Overlay extends LitElement {
       <div class="background">
         <div class="content">
           <div class="header">
-            <span>SESSÃO ${this.sessionState.code}</span>
+            <mmp-typography variant="h3">SESSÃO ${this.sessionState.code}</mmp-typography>
           </div>
+
           <div class="body">
             ${this.status === OverlayStatus.NOT_STARTED ? this.notStartedTemplate() : ''}
           </div>
@@ -153,10 +147,37 @@ export class Overlay extends LitElement {
       align-items: center;
     }
 
-    .body .title {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      font-weight: bold;
+    .not-started {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .info {
+      margin: 2rem 0;
+    }
+
+    button {
+      border: 0;
+      padding: 0.5rem 1rem;
+      font-family: var(--mmp-font-primary, sans-serif);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .actions button {
+      background-color: white;
+      color: var(--mmp-color-primary);
+    }
+
+    .actions button + button {
+      background-color: var(--mmp-color-primary);
+      color: white;
     }
   `
 }

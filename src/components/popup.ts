@@ -2,6 +2,8 @@ import { chromeMessages } from '@/core/chromeMessages'
 import { html, css, LitElement } from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 
+import './ui/typography';
+
 @customElement('mmp-popup')
 export class Popup extends LitElement {
   @state()
@@ -121,6 +123,8 @@ export class Popup extends LitElement {
       text-align: center;
       padding: 1em;
       margin: 0 auto;
+      max-width: 500px;
+      width: 100%;
     }
   `
 }
