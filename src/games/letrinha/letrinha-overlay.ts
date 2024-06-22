@@ -5,6 +5,7 @@ import { customElement, state } from "lit/decorators.js";
 import * as script from "./letrinha-script";
 import { letrinhaEvents } from "./letrinha-events";
 import { SocketMessages, socketMessages } from "party/utils/messages";
+import { classMap } from "lit/directives/class-map.js";
 
 @customElement('mmp-letrinha-overlay')
 export class LetrinhaOverlay extends LitElement {
@@ -64,7 +65,19 @@ export class LetrinhaOverlay extends LitElement {
             ${this.sessionState.players.map(player => {
               const state = this.playerState[player.connectionId] || {};
               return html`
-                <p>${player.name} - ${state.currentAttempt}/${state.maxAttempts}</p>
+                <div>
+                  <p>${player.name} - ${state.currentAttempt}/${state.maxAttempts}</p>
+                  <div class="tile-wrapper">
+                    ${state.lastValues?.map((value: script.Guess) => html`
+                      <div class=${classMap({
+                        wrong: value === script.Guess.WRONG,
+                        partial: value === script.Guess.PARTIAL,
+                        exact: value === script.Guess.EXACT,
+                        tile: true
+                      })}></div>
+                    `)}
+                  </div>
+                </div>
               `
             })}
           </div>
@@ -89,6 +102,28 @@ export class LetrinhaOverlay extends LitElement {
       background: rgba(255,255,255,0.2);
       border-radius: 16px;
       padding: 6px;
+    }
+
+    .tile-wrapper {
+      display: flex;
+      gap: 2px;
+    }
+    
+    .tile {
+      width: 16px;
+      height: 16px;
+    }
+
+    .wrong {
+      background: red;
+    }
+
+    .partial {
+      background: yellow;
+    }
+
+    .exact {
+      background: green;
     }
 
     p {

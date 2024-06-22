@@ -1,7 +1,7 @@
 import { Player } from "party/utils/messages";
 import { letrinhaEvents } from "./letrinha-events";
 
-enum Guess {
+export enum Guess {
   WRONG = 0,
   PARTIAL = 1,
   EXACT = 2
@@ -24,58 +24,63 @@ const backgroundToGuess = (background: string): Guess => {
 export function run() {
   console.log('Running Letrinha script')
 
-  const guessesGrid = document.querySelector('section[class*="FieldsContainer"]')
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      setTimeout(() => retrieveGameState(), 500)
+    }
+  })
 
+  const sendButton = document.querySelector('button[title="Enviar palavra"]')
+  sendButton?.addEventListener('click', () => {
+    setTimeout(() => retrieveGameState(), 500)
+  })
+}
+
+const retrieveGameState = () => {
   let lastStateAttempt = 0;
+  const groups = Array.from(document.querySelectorAll('div[class*="FieldWrapper"]'))
+  
+  const groupsAndFields = groups
+    .map(group => {
+      const fields = Array.from(group.querySelectorAll('button'))
+      const fieldsValues = fields
+        .filter(field => {
+          const styles = getComputedStyle(field)
+          return field.textContent !== '' && styles.borderWidth === '0px'
+        })
+        .map(field => {
+          const styles = getComputedStyle(field)
+          console.log('Field', field.textContent, styles.backgroundColor)
+          return backgroundToGuess(styles.backgroundColor)
+        })
 
-  const observer = new MutationObserver(() => {
-    const groups = Array.from(document.querySelectorAll('div[class*="FieldWrapper"]'))
-  
-    const groupsAndFields = groups
-      .map(group => {
-        const fields = Array.from(group.querySelectorAll('button'))
-        const fieldsValues = fields
-          .filter(field => {
-            const styles = getComputedStyle(field)
-            return field.textContent !== '' && styles.borderWidth === '0px'
-          })
-          .map(field => {
-            const styles = getComputedStyle(field)
-            return backgroundToGuess(styles.backgroundColor)
-          })
-  
-        return fieldsValues
-      })
-      .filter(group => group.length > 0)
-  
-    const attempt = groupsAndFields.length;
-    const maxAttempts = groups.length;
-    const lastValues = groupsAndFields[groupsAndFields.length - 1]
+      return fieldsValues
+    })
+    .filter(group => group.length > 0)
 
-    if (attempt === lastStateAttempt) {
-      return;
+  console.log('Groups and fields', groupsAndFields)
+  
+  const attempt = groupsAndFields.length;
+  const maxAttempts = groups.length;
+  const lastValues = groupsAndFields[groupsAndFields.length - 1]
+
+  if (attempt === lastStateAttempt) {
+    return;
+  }
+
+  const gameState: LetrinhaGameState = {
+    currentAttempt: attempt,
+    maxAttempts: maxAttempts,
+    lastValues: lastValues
+  }
+
+  lastStateAttempt = attempt;
+
+  window.dispatchEvent(new CustomEvent(letrinhaEvents.NEW_GUESS, {
+    detail: {
+      gameState
     }
-
-    const gameState: LetrinhaGameState = {
-      currentAttempt: attempt,
-      maxAttempts: maxAttempts,
-      lastValues: lastValues
-    }
-
-    lastStateAttempt = attempt;
-
-    window.dispatchEvent(new CustomEvent(letrinhaEvents.NEW_GUESS, {
-      detail: {
-        gameState
-      }
-    }))
-  })
-  
-  observer.observe(guessesGrid!, {
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['class']
-  })
+  }))
 }
 
 export function getInitialState(players: Player[]) {

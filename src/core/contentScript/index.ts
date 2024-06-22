@@ -34,16 +34,16 @@ const supportedGames: GameIntegration[] = [
     overlayElement: 'mmp-letrinha-overlay',
     preconditions: [
       {
-        query: 'section[class*="FieldsContainer"]',
-        quantity: 1
-      }, 
-      {
         query: 'div[class*="FieldWrapper"]',
         quantity: (elementsFound) => elementsFound === 6 || elementsFound === 7,
       },
       {
         query: 'div[class*="FieldWrapper"] button',
         quantity: (elementsFound) => elementsFound === 6 * 5 || elementsFound === 7 * 6,
+      },
+      {
+        query: 'button[title="Enviar palavra"]',
+        quantity: 1
       }
     ],
     timeout: 1000
