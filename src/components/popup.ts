@@ -2,6 +2,7 @@ import { chromeMessages } from '@/core/chromeMessages'
 import { html, css, LitElement } from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 
+import '../index.css';
 import './ui/typography';
 
 @customElement('mmp-popup')
