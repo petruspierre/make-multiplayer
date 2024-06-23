@@ -1,5 +1,4 @@
 import { OverlayStatus } from "@/components/overlay"
-import PartySocket from "partysocket";
 
 export type ChromeMessage = {
   type: keyof typeof chromeMessages;

@@ -52,15 +52,12 @@ const retrieveGameState = () => {
         })
         .map(field => {
           const styles = getComputedStyle(field)
-          console.log('Field', field.textContent, styles.backgroundColor)
           return backgroundToGuess(styles.backgroundColor)
         })
 
       return fieldsValues
     })
     .filter(group => group.length > 0)
-
-  console.log('Groups and fields', groupsAndFields)
   
   const attempt = groupsAndFields.length;
   const maxAttempts = groups.length;
