@@ -13,7 +13,6 @@ export default defineConfig({
       input: {
         options: path.resolve('templates', 'options.html'),
         popup: path.resolve('templates', 'popup.html'),
-        sidepanel: path.resolve('templates', 'sidepanel.html'),
       },
       output: {
         chunkFileNames: 'assets/chunk-[hash].js',

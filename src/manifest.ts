@@ -20,10 +20,6 @@ export default defineManifest({
     default_icon: 'img/logo-48.png',
   },
   options_page: 'templates/options.html',
-  background: {
-    service_worker: 'src/core/background/index.ts',
-    type: 'module',
-  },
   content_scripts: [
     {
       matches: ['https://letrinha.petrus.dev.br/game', 'https://www.nytimes.com/games/wordle/*'],
@@ -31,14 +27,11 @@ export default defineManifest({
       run_at: 'document_start'
     },
   ],
-  side_panel: {
-    default_path: 'templates/sidepanel.html',
-  },
   web_accessible_resources: [
     {
       resources: ['img/logo-16.png', 'img/logo-34.png', 'img/logo-48.png', 'img/logo-128.png'],
       matches: [],
     },
   ],
-  permissions: ['sidePanel', 'storage'],
+  permissions: [],
 })
