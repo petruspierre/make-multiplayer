@@ -4,10 +4,12 @@ export const socketMessages = {
   LOAD_PLAYERS: 'socket:load:players',
   SESSION_STARTED: 'socket:session:started',
   PLAYER_STATE_UPDATED: 'socket:state:updated',
+  SESSION_ENDED: 'socket:session:ended',
 
   START_SESSION: 'socket:session:start',
   PLAYER_STATE_HYDRATE: 'socket:state:hydrate',
-  PLAYER_STATE_UPDATE: 'socket:state:update'
+  PLAYER_STATE_UPDATE: 'socket:state:update',
+  END_SESSION: 'socket:session:end'
 }
 
 export type SocketMessages = {

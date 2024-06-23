@@ -73,15 +73,6 @@ function insertOverlay() {
     console.log(`Game detected: ${name}`)
     console.log(`Start checking ${preconditions.length} preconditions...`)
 
-    const rootElement = document.querySelector(root)
-    sessionProvider = document.createElement('mmp-session-provider');
-    rootElement?.appendChild(sessionProvider)
-
-    rootOverlay = document.createElement('mmp-overlay')
-    sessionProvider.shadowRoot!.appendChild(rootOverlay)
-
-    console.log('Root overlay element inserted')
-
     let time = 0;
     let conditionsMet = new Map<string, boolean>()
   
@@ -119,6 +110,15 @@ function insertOverlay() {
             root.style.setProperty('--mmp-color-primary', elementStyle.backgroundColor)
           }
         }
+
+        const rootElement = document.querySelector(root)
+        sessionProvider = document.createElement('mmp-session-provider');
+        rootElement?.appendChild(sessionProvider)
+
+        rootOverlay = document.createElement('mmp-overlay')
+        sessionProvider.shadowRoot!.appendChild(rootOverlay)
+
+        console.log('Root overlay element inserted')
 
         return
       }

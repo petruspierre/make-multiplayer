@@ -37,17 +37,29 @@ export class LetrinhaOverlay extends LitElement {
 
     window.addEventListener(letrinhaEvents.NEW_GUESS as any, (event: CustomEvent) => {
       console.log('New guess', event.detail.gameState)
+      const newState: script.LetrinhaGameState = event.detail.gameState;
+
       this.sessionState.sendMessage({
         type: socketMessages.PLAYER_STATE_UPDATE,
         payload: {
-          gameState: event.detail.gameState
+          gameState: newState
         }
       })
     })
 
     this.sessionState.addListener(socketMessages.PLAYER_STATE_UPDATED, (event: SocketMessages) => {
       console.log('Player state updated', event.payload)
-      const { playerState } = event.payload;
+      const { playerState } = event.payload as { playerState: Record<string, script.LetrinhaGameState> };
+
+      const finishedPlayers = this.sessionState.players
+        .filter(player => playerState[player.connectionId].endedAt);
+      
+      if (isHost && finishedPlayers.length === this.sessionState.players.length) {
+        this.sessionState.sendMessage({
+          type: socketMessages.END_SESSION,
+          payload: null
+        })
+      }
 
       this.playerState = playerState;
     })

@@ -10,7 +10,9 @@ export enum Guess {
 export type LetrinhaGameState = {
   currentAttempt: number;
   maxAttempts: number;
-  lastValues: Guess[]
+  lastValues: Guess[];
+  startedAt?: number;
+  endedAt?: number;
 }
 
 const backgroundToGuess = (background: string): Guess => {
@@ -74,6 +76,10 @@ const retrieveGameState = () => {
     lastValues: lastValues
   }
 
+  if (lastValues.every(value => value === Guess.EXACT)) {
+    gameState.endedAt = Date.now();
+  }
+
   lastStateAttempt = attempt;
 
   window.dispatchEvent(new CustomEvent(letrinhaEvents.NEW_GUESS, {
@@ -90,7 +96,8 @@ export function getInitialState(players: Player[]) {
     acc[player.connectionId] = {
       currentAttempt: 0,
       maxAttempts: maxAttempts,
-      lastValues: []
+      lastValues: [],
+      startedAt: Date.now(),
     }
     return acc;
   }, {} as Record<string, LetrinhaGameState>)

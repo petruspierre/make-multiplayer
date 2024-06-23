@@ -55,9 +55,17 @@ export default class SessionServer implements Party.Server {
           type: socketMessages.SESSION_STARTED
         }))
         break
+      case socketMessages.END_SESSION:
+        this.room.broadcast(json({
+          type: socketMessages.SESSION_ENDED
+        }))
+        break
       case socketMessages.PLAYER_STATE_UPDATE:
         const { gameState } = message.payload
-        this.playerState[sender.id] = gameState
+        this.playerState[sender.id] = {
+          ...this.playerState[sender.id],
+          ...gameState
+        }
 
         this.room.broadcast(json({
           type: socketMessages.PLAYER_STATE_UPDATED,

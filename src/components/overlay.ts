@@ -25,21 +25,29 @@ export class Overlay extends LitElement {
 
     if (_changedProperties.has('sessionState')) {
       const previousStatus = _changedProperties.get('sessionState')?.status
-      if (previousStatus === SessionStatus.NOT_CONNECTED && this.sessionState.status === SessionStatus.CONNECTED) {
-        console.log('Start listening for session started')
-        this.sessionState.addListener(socketMessages.SESSION_STARTED, () => {
-          console.log('Session started')
-          this.status = OverlayStatus.IN_PROGRESS
-        })
-      }
+      this.handleSessionStatusChange(previousStatus)
+    }
+  }
 
-      if (this.sessionState.status === SessionStatus.CONNECTED) {
-        this.status = OverlayStatus.NOT_STARTED
-      }
+  private handleSessionStatusChange(previousStatus: SessionStatus) {
+    const currentStatus = this.sessionState.status
 
-      if (this.sessionState.status === SessionStatus.ERROR || this.sessionState.status === SessionStatus.NOT_CONNECTED) {
-        this.status = OverlayStatus.NOT_CONNECTED
-      }
+    if (previousStatus === SessionStatus.NOT_CONNECTED && currentStatus === SessionStatus.CONNECTED) {
+      this.sessionState.addListener(socketMessages.SESSION_STARTED, () => {
+        this.status = OverlayStatus.IN_PROGRESS
+      })
+
+      this.sessionState.addListener(socketMessages.SESSION_ENDED, () => {
+        this.status = OverlayStatus.FINISHED
+      })
+    }
+
+    if (currentStatus === SessionStatus.CONNECTED) {
+      this.status = OverlayStatus.NOT_STARTED
+    }
+
+    if (currentStatus === SessionStatus.ERROR || currentStatus === SessionStatus.NOT_CONNECTED) {
+      this.status = OverlayStatus.NOT_CONNECTED
     }
   }
 
@@ -59,7 +67,7 @@ export class Overlay extends LitElement {
     }
 
     return html`
-      <div class="not-started">
+      <div class="body-content">
         ${this.players.length === 1 ? html`
           <mmp-typography variant="h2">Aguardando mais jogadores...</mmp-typography>
         ` : this.isHost ? html`
@@ -90,6 +98,22 @@ export class Overlay extends LitElement {
     })
   }
 
+  finishedTemplate() {
+    return html`
+      <div class="body-content">
+        <mmp-typography variant="h2">Fim de jogo!</mmp-typography>
+
+        <div class="info">
+          <mmp-typography variant="body1">${this.players.length} conectado${this.players.length !== 1 ? 's' : ''}.</mmp-typography>
+        </div>
+
+        <div class="actions">
+          <button @click=${() => this.sessionState.leaveSession()}>Sair da sessão</button>
+        </div>
+      </div>
+    `
+  }
+
   render() {
     if (this.status === OverlayStatus.NOT_CONNECTED) {
       return html``
@@ -110,6 +134,7 @@ export class Overlay extends LitElement {
 
           <div class="body">
             ${this.status === OverlayStatus.NOT_STARTED ? this.notStartedTemplate() : ''}
+            ${this.status === OverlayStatus.FINISHED ? this.finishedTemplate() : ''}
           </div>
         </div>
       </div>
@@ -147,7 +172,7 @@ export class Overlay extends LitElement {
       align-items: center;
     }
 
-    .not-started {
+    .body-content {
       display: flex;
       flex-direction: column;
       align-items: center;
