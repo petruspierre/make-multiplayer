@@ -47,26 +47,34 @@ export class Popup extends LitElement {
   render() {
     return html`
       <main>
-        Make Multiplayer
+        <div class="header">
+          <mmp-typography variant="body1">
+            Make Multiplayer
+          </mmp-typography>
+        </div>
 
-        ${this.loading ? html`<p>Loading...</p>` : ''}
+        ${this.loading ? html`<p>Carregando...</p>` : ''}
 
         ${this.sessionCode ? html`
           <div>
-            <span>Session: ${this.sessionCode}</span>
+            <span>Sessão: ${this.sessionCode}</span>
           </div>
         ` : html`
           <div>
-            <div>
+            <div class="join">
               <input
                 type="text"
-                placeholder="Session Code"
+                placeholder="Código"
                 required
                 @input=${(e: InputEvent) => this.sessionInput = (e.target as HTMLInputElement).value} 
               />
-              <button @click=${this.joinSession} ?disabled=${this.loading || this.sessionInput.length === 0}>JOIN</button>
+              <button @click=${this.joinSession} ?disabled=${this.loading || this.sessionInput.length === 0}>ENTRAR</button>
             </div>
-            <button @click=${this.createNewSession} ?disabled=${this.loading}>CREATE</button>
+
+            <div class="create">
+              <mmp-typography variant="caption">ou</mmp-typography>
+              <button @click=${this.createNewSession} ?disabled=${this.loading}>CRIAR SESSÃO</button>
+            </div>
           </div>
         `}
       </main>
@@ -113,18 +121,58 @@ export class Popup extends LitElement {
   }
 
   static styles = css`
-    @media (prefers-color-scheme: light) {
-      a:hover {
-        color: #324fff;
-      }
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      margin: 0 auto;
+      width: 300px;
     }
 
-    main {
-      text-align: center;
-      padding: 1em;
-      margin: 0 auto;
-      max-width: 500px;
-      width: 100%;
+    button {
+      background-color: #3a6ea5;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-family: var(--mmp-font-primary, sans-serif);
+      color: white;
+      font-weight: 600;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #004e98;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    input {
+      padding: 0.5rem;
+      border: 1px solid #3a6ea5;
+      border-radius: 4px;
+      font-family: var(--mmp-font-primary, sans-serif);
+    }
+
+    .header {
+      margin-bottom: 1rem;
+    }
+
+    .join {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .create {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   `
 }
