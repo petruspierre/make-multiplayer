@@ -33,6 +33,8 @@ export class Overlay extends LitElement {
     const currentStatus = this.sessionState.status
 
     if (previousStatus === SessionStatus.NOT_CONNECTED && currentStatus === SessionStatus.CONNECTED) {
+      this.status = OverlayStatus.NOT_STARTED
+
       this.sessionState.addListener(socketMessages.SESSION_STARTED, () => {
         this.status = OverlayStatus.IN_PROGRESS
       })
@@ -40,10 +42,6 @@ export class Overlay extends LitElement {
       this.sessionState.addListener(socketMessages.SESSION_ENDED, () => {
         this.status = OverlayStatus.FINISHED
       })
-    }
-
-    if (currentStatus === SessionStatus.CONNECTED) {
-      this.status = OverlayStatus.NOT_STARTED
     }
 
     if (currentStatus === SessionStatus.ERROR || currentStatus === SessionStatus.NOT_CONNECTED) {

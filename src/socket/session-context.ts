@@ -109,14 +109,14 @@ export class SessionProvider extends LitElement {
   private connectToSession = async (code: string) => {
     const socket = getSocketForSession(code)
 
+    this.listeners.clear()
+
     socket.onmessage = (event) => {
       const message: SocketMessages = JSON.parse(event.data)
       console.log('Received socket message', message)
 
-      console.log(this.listeners.keys())
       this.listeners.forEach((callback, key) => {
         if (message.type === key) {
-          console.log('Caught listener for event', message.type)
           callback(message)
         }
       })

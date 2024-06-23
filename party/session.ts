@@ -41,6 +41,19 @@ export default class SessionServer implements Party.Server {
       }
 
       this.room.broadcast(playerDisconnected(this.players))
+
+      delete this.playerState[connection.id]
+
+      this.room.broadcast(json({
+        type: socketMessages.PLAYER_STATE_UPDATED,
+        payload: {
+          playerState: this.playerState
+        }
+      }))
+    }
+
+    if (this.players.length === 0) {
+      this.playerState = {}
     }
   }
 
