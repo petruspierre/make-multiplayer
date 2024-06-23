@@ -7,6 +7,8 @@
 # testing
 /coverage
 
+/types
+
 # production
 /build
 /package
