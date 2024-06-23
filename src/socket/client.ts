@@ -1,7 +1,7 @@
 import PartySocket from "partysocket";
 
 export const getSocketForSession = (room: string) => new PartySocket({
-  host: 'localhost:1999',
+  host: import.meta.env.VITE_PARTY_KIT_HOST,
   party: 'session',
   room
 })

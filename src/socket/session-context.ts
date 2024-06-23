@@ -66,7 +66,7 @@ export class SessionProvider extends LitElement {
 
   private createNewSession = async () => {
     try {
-      const response = await fetch(`http://localhost:1999/party/make-multiplayer-party`, {
+      const response = await fetch(`${import.meta.env.VITE_PARTY_KIT_URL}/party/make-multiplayer-party`, {
         method: "POST",
       });
 
