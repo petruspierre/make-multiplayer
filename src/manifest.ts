@@ -22,7 +22,7 @@ export default defineManifest({
   options_page: 'templates/options.html',
   content_scripts: [
     {
-      matches: ['https://letrinha.petrus.dev.br/game', 'https://www.nytimes.com/games/wordle/*'],
+      matches: ['https://letrinha.petrus.dev.br/game'],
       js: ['src/core/contentScript/index.ts'],
       run_at: 'document_start'
     },

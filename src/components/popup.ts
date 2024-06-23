@@ -68,7 +68,7 @@ export class Popup extends LitElement {
                 required
                 @input=${(e: InputEvent) => this.sessionInput = (e.target as HTMLInputElement).value} 
               />
-              <button @click=${this.joinSession} ?disabled=${this.loading || this.sessionInput.length === 0}>ENTRAR</button>
+              <button @click=${this.joinSession} ?disabled=${this.loading || this.sessionInput.length < 6}>ENTRAR</button>
             </div>
 
             <div class="create">
