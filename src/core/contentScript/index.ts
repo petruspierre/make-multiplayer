@@ -1,3 +1,5 @@
+import 'lit/polyfill-support.js'
+
 import { Overlay } from '../../components/overlay';
 import { SessionProvider } from '../../socket/session-context';
 

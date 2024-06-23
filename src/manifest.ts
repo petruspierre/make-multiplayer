@@ -23,7 +23,7 @@ export default defineManifest({
   content_scripts: [
     {
       matches: ['https://letrinha.petrus.dev.br/game'],
-      js: ['src/core/contentScript/index.ts'],
+      js: ['./node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js', 'src/core/contentScript/index.ts'],
       run_at: 'document_start'
     },
   ],

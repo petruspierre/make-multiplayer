@@ -1,4 +1,4 @@
-import { html, LitElement, PropertyValues } from "lit";
+import { html, LitElement } from "lit";
 import { createContext, provide } from "@lit/context";
 import { customElement, property, state } from "lit/decorators.js";
 import PartySocket from "partysocket";
