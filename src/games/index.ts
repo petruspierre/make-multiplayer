@@ -1,3 +1,5 @@
+import './letrinha/letrinha-overlay';
+
 type Precondition = {
   query: string;
   quantity: number | ((elementsFound: number) => boolean);

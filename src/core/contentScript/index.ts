@@ -6,7 +6,6 @@ import { supportedGames } from '../../games';
 
 import '../../components/overlay'
 import '../../socket/session-context'
-import '../../games/letrinha/letrinha-overlay'
 import '../../components/ui/draggable-box'
 import '../../components/ui/typography'
 

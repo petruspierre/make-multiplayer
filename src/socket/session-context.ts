@@ -58,7 +58,10 @@ export class SessionProvider extends LitElement {
           this.joinSession(payload.code)
           break
         case chromeMessages.FETCH_SESSION:
-          sendResponse(this.state.code)
+          sendResponse(JSON.stringify({
+            code: this.state.code,
+            sessionStatus: this.state.status
+          }))
           break
       }
     })

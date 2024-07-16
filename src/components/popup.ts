@@ -4,6 +4,10 @@ import { customElement, state } from 'lit/decorators.js'
 
 import '../index.css';
 import './ui/typography';
+import { supportedGames } from '@/games';
+import { SessionStatus } from '@/socket/session-context';
+
+type PopupStatus = 'error' | 'loaded' | 'connected' | 'loading' | 'menu'
 
 @customElement('mmp-popup')
 export class Popup extends LitElement {
@@ -14,7 +18,7 @@ export class Popup extends LitElement {
   private sessionInput: string = ''
 
   @state()
-  private loading: boolean = false
+  private status: PopupStatus = 'loading'
 
   private pingInterval: NodeJS.Timeout | null = null
 
@@ -22,7 +26,19 @@ export class Popup extends LitElement {
     super.connectedCallback();
 
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+      const url = tab.url || ''
+
+      if (!supportedGames.map(game => game.url).includes(url)) {
+        console.log('Tab not supported')
+        this.status = 'menu'
+        return
+      }
+
       this.pingSessionState(tab.id!)
+
+      if (this.status === 'loading') {
+        this.status = 'loaded'
+      }
 
       this.pingInterval = setInterval(this.pingSessionState.bind(this), 1000, tab.id!)
     });
@@ -40,8 +56,25 @@ export class Popup extends LitElement {
     chrome.tabs.sendMessage(tabId, {
       type: chromeMessages.FETCH_SESSION,
     }, (data: string) => {
-      this.sessionCode = data
-      this.loading = false
+      console.log(data)
+      if(!data) return
+
+      const parsedData = JSON.parse(data) as {
+        code: string | null;
+        sessionStatus: SessionStatus | null
+      }
+      const { code, sessionStatus } = parsedData
+
+      if (sessionStatus === SessionStatus.ERROR) {
+        this.status = 'error'
+        return
+      }
+
+      if (code) {
+        this.sessionCode = code
+        this.status = 'connected'
+        clearInterval(this.pingInterval!)
+      }
     })
   }
 
@@ -54,13 +87,15 @@ export class Popup extends LitElement {
           </mmp-typography>
         </div>
 
-        ${this.loading ? html`<p>Carregando...</p>` : ''}
+        ${this.status === 'loading' ? html`<p>Carregando...</p>` : ''}
 
-        ${this.sessionCode ? html`
+        ${this.status === 'connected' ? html`
           <div>
             <span>Sessão: ${this.sessionCode}</span>
           </div>
-        ` : html`
+        ` : ''}
+
+        ${this.status === 'loaded' ? html`
           <div>
             <div class="join">
               <input
@@ -69,26 +104,32 @@ export class Popup extends LitElement {
                 required
                 @input=${(e: InputEvent) => this.sessionInput = (e.target as HTMLInputElement).value} 
               />
-              <button @click=${this.joinSession} ?disabled=${this.loading || this.sessionInput.length < 6}>ENTRAR</button>
+              <button @click=${this.joinSession} ?disabled=${this.sessionInput.length < 6}>ENTRAR</button>
             </div>
 
             <div class="create">
               <mmp-typography variant="caption">ou</mmp-typography>
-              <button @click=${this.createNewSession} ?disabled=${this.loading}>CRIAR SESSÃO</button>
+              <button @click=${this.createNewSession}>CRIAR SESSÃO</button>
             </div>
           </div>
-        `}
+        ` : ''}
+
+        ${this.status === 'menu' ? html`
+          <div class="menu">
+            <mmp-typography variant="body1">Inicie um jogo suportado para começar!</mmp-typography>
+          </div>
+        ` : ''}
       </main>
     `
   }
 
   private createNewSession = async () => {
-    this.loading = true
+    this.status = 'loading'
 
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab) {
-        this.loading = false
+        this.status = 'error'
         return
       }
 
@@ -96,17 +137,17 @@ export class Popup extends LitElement {
         type: chromeMessages.CREATE_SESSION,
       })
     } catch(err) {
-      this.loading = false
+      this.status = 'error'
     }
   }
 
   private joinSession = async () => {
-    this.loading = true
+    this.status = 'loading'
 
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab) {
-        this.loading = false
+        this.status = 'error'
         return
       }
 
@@ -117,7 +158,7 @@ export class Popup extends LitElement {
         }
       })
     } catch(err) {
-      this.loading = false
+      this.status = 'error'
     }
   }
 
@@ -174,6 +215,12 @@ export class Popup extends LitElement {
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+
+    .menu {
+      display: flex;
+      text-align: center;
+      justify-content: center;
     }
   `
 }
