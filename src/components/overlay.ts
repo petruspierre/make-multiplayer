@@ -20,6 +20,12 @@ export class Overlay extends LitElement {
   @state()
   sessionState!: SessionState;
 
+  @property()
+  showGameOverlay: () => void = () => { };
+  
+  @property()
+  hideGameOverlay: () => void = () => {};
+
   protected updated(_changedProperties: PropertyValues): void {
     super.updated(_changedProperties);
 
@@ -37,10 +43,12 @@ export class Overlay extends LitElement {
 
       this.sessionState.addListener(socketMessages.SESSION_STARTED, () => {
         this.status = OverlayStatus.IN_PROGRESS
+        this.showGameOverlay()
       })
 
       this.sessionState.addListener(socketMessages.SESSION_ENDED, () => {
         this.status = OverlayStatus.FINISHED
+        this.hideGameOverlay()
       })
     }
 
@@ -113,14 +121,8 @@ export class Overlay extends LitElement {
   }
 
   render() {
-    if (this.status === OverlayStatus.NOT_CONNECTED) {
+    if (this.status === OverlayStatus.NOT_CONNECTED || this.status === OverlayStatus.IN_PROGRESS) {
       return html``
-    }
-
-    if (this.status === OverlayStatus.IN_PROGRESS) {
-      return html`
-        <mmp-letrinha-overlay></mmp-letrinha-overlay>
-      `
     }
 
     return html`

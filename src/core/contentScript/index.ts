@@ -68,6 +68,16 @@ function insertOverlay() {
         rootOverlay = document.createElement('mmp-overlay')
         sessionProvider.shadowRoot!.appendChild(rootOverlay)
 
+        const gameOverlay = document.createElement(game.overlayElement)
+
+        rootOverlay.showGameOverlay = () => {
+          sessionProvider.shadowRoot!.appendChild(gameOverlay)
+        }
+
+        rootOverlay.hideGameOverlay = () => {
+          sessionProvider.shadowRoot!.removeChild(gameOverlay)
+        }
+
         console.log('Root overlay element inserted')
 
         return
