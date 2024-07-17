@@ -18,10 +18,10 @@ export function run() {
     const items = Array.from(statusBarWrapper!.querySelectorAll('.status-bar-item-value'))
     const groups = Array.from(document.querySelectorAll('.board-group'))
 
-    if(!items || items.length === 0) return
+    if (!items || items.length === 0) return
 
-    const attempt = items[0]?.textContent
-    const hints = items[1]?.textContent
+    const attempt = items[0]?.textContent || '0'
+    const hints = items[1]?.textContent || '0'
 
     const parsedGroups = groups.map(group => {
       const styles = getComputedStyle(group)
