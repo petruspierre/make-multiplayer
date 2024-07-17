@@ -1,7 +1,7 @@
 {
   "name": "make-multiplayer",
   "displayName": "Make Multiplayer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "petruspierre",
   "description": "Com a extensão Make Multiplayer você consegue jogar os seus jogos web favoritos com seus amigos!",
   "type": "module",

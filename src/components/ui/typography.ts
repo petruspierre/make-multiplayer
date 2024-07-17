@@ -18,13 +18,16 @@ export class Typography extends LitElement {
     caption: literal`span`
   }
 
+  @property({ attribute: true, type: Number })
+  weight: number | null = null
+
   getTag() {
     return this.variantToTag[this.variant] || literal`span`
   }
 
   render() {
     return html`
-      <${this.getTag()} class="${this.variant}">
+      <${this.getTag()} class="${this.variant}" style=${this.weight !== null ? `font-weight: ${this.weight}` : ""}>
         <slot></slot>
       </${this.getTag()}>
     `

@@ -1,4 +1,5 @@
 import './letrinha/letrinha-overlay';
+import './conexo/conexo-overlay';
 
 type Precondition = {
   query: string;
@@ -9,7 +10,7 @@ type GameIntegration = {
   name: string;
   url: string;
   root: string;
-  overlayElement?: string;
+  overlayElement: string;
   preconditions: Precondition[];
   pickStyles?: {
     primaryFont?: string;
@@ -22,6 +23,7 @@ export const supportedGames: GameIntegration[] = [
   {
     name: 'Letrinha',
     url: 'https://letrinha.petrus.dev.br/game',
+    overlayElement: 'mmp-letrinha-overlay',
     root: 'body',
     preconditions: [
       {
@@ -39,6 +41,27 @@ export const supportedGames: GameIntegration[] = [
     ],
     pickStyles: {
       primaryFont: 'button[title="Enviar palavra"]',
+      primaryColor: 'body'
+    },
+    timeout: 1000
+  }, 
+  {
+    name: 'Conexo',
+    overlayElement: 'mmp-conexo-overlay',
+    url: 'https://conexo.ws/pt/daily',
+    root: 'body',
+    preconditions: [
+      {
+        query: '.game-title',
+        quantity: 1
+      },
+      {
+        query: '.board-item ',
+        quantity: 16
+      }
+    ],
+    pickStyles: {
+      primaryFont: '.game-title',
       primaryColor: 'body'
     },
     timeout: 1000

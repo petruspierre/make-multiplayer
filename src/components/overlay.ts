@@ -150,7 +150,7 @@ export class Overlay extends LitElement {
       height: 100%;
       background-color: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(2px);
-      z-index: 1000;
+      z-index: 10000000000;
     }
     
     .content {
